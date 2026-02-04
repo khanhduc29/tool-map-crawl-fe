@@ -15,6 +15,7 @@ body {
     radial-gradient(circle at top left, #1e293b, transparent 40%),
     radial-gradient(circle at bottom right, #020617, #020617);
   color: #e5e7eb;
+  overflow-x: hidden;
 }
 
 /* ================= LAYOUT ================= */
@@ -24,6 +25,9 @@ body {
   min-height: 100vh;
   gap: 24px;
   padding: 24px;
+  width: 100%;
+  overflow-x: hidden;
+
 }
 
 /* ================= LEFT PANEL ================= */
@@ -155,6 +159,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 /* ================= TABS ================= */
@@ -364,3 +370,26 @@ textarea.error:focus {
   opacity: 0.4;
   cursor: not-allowed;
 }
+/* Chỉ scroll ngang */
+.table-x-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Table rộng hơn container để kích hoạt scroll ngang */
+.table-x-scroll table {
+  width: max-content;      /* 🔥 QUAN TRỌNG */
+  min-width: 1200px;       /* tùy số cột */
+  border-collapse: collapse;
+}
+.table-x-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-x-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+
+

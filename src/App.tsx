@@ -324,66 +324,70 @@ export default function App() {
 
         {/* ===== JOBS ===== */}
         {tab === "jobs" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Job ID</th>
-                <th>Keyword</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.map((job) => (
-                <tr key={job.id}>
-                  <td>{job.id.slice(0, 8)}</td>
-                  <td>{job.raw_keywords}</td>
-                  <td>{job.status}</td>
-                  <td>
-                    <button
-                      onClick={() => {
-                        setSelectedJobId(job.id);
-                        fetchTasks(job.id);
-                        setTab("tasks");
-                      }}
-                    >
-                      Xem task
-                    </button>
-                  </td>
+          <div className="table-x-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Keyword</th>
+                  <th>Status</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {jobs.map((job) => (
+                  <tr key={job.id}>
+                    <td>{job.id.slice(0, 8)}</td>
+                    <td>{job.raw_keywords}</td>
+                    <td>{job.status}</td>
+                    <td>
+                      <button
+                        onClick={() => {
+                          setSelectedJobId(job.id);
+                          fetchTasks(job.id);
+                          setTab("tasks");
+                        }}
+                      >
+                        Xem task
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* ===== TASKS ===== */}
         {tab === "tasks" && (
-          <table>
-            <thead>
-              <tr>
-                <th>Task ID</th>
-                <th>Keyword</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {tasks.map((task) => (
-                <tr key={task.id}>
-                  <td>{task.id.slice(0, 8)}</td>
-                  <td>{task.keyword}</td>
-                  <td>{task.status}</td>
-                  <td>
-                    {task.status === "success" && (
-                      <button onClick={() => fetchTaskDetail(task.id)}>
-                        Xem kết quả
-                      </button>
-                    )}
-                  </td>
+          <div className="table-x-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Task ID</th>
+                  <th>Keyword</th>
+                  <th>Status</th>
+                  <th></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {tasks.map((task) => (
+                  <tr key={task.id}>
+                    <td>{task.id.slice(0, 8)}</td>
+                    <td>{task.keyword}</td>
+                    <td>{task.status}</td>
+                    <td>
+                      {task.status === "success" && (
+                        <button onClick={() => fetchTaskDetail(task.id)}>
+                          Xem kết quả
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {/* ===== TASK RESULT ===== */}
@@ -405,124 +409,129 @@ export default function App() {
               </button>
             </h3>
 
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <SortableTh label="Name" field="name" />
-                  <SortableTh label="Rating" field="rating" />
-                  <SortableTh label="Reviews" field="totalReviews" />
-                  <SortableTh label="Address" field="address" />
-                  <SortableTh label="Phone" field="phone" />
-                  <SortableTh label="Website" field="website" />
-                  {showSocials && (
-                    <>
-                      <SortableTh label="Email" field="socials.email" />
-                      <SortableTh label="Facebook" field="socials.facebook" />
-                      <SortableTh label="Instagram" field="socials.instagram" />
-                      <SortableTh label="LinkedIn" field="socials.linkedin" />
-                      <SortableTh label="Twitter" field="socials.twitter" />
-                      <SortableTh label="YouTube" field="socials.youtube" />
-                      <SortableTh label="TikTok" field="socials.tiktok" />
-                    </>
-                  )}
-                  <th>Maps</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pagedResults.map((item: any, index: number) => (
-                  <tr key={index}>
-                    <td>{(page - 1) * pageSize + index + 1}</td>
-                    <td>{item.name}</td>
-                    <td>{item.rating ?? "-"}</td>
-                    <td>{item.totalReviews ?? "-"}</td>
-                    <td>{item.address ?? "-"}</td>
-                    <td>{item.phone ?? "-"}</td>
-                    <td>
-                      {item.website ? (
-                        <a href={item.website} target="_blank">
-                          Link
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-
+            <div className="table-x-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <SortableTh label="Name" field="name" />
+                    <SortableTh label="Rating" field="rating" />
+                    <SortableTh label="Reviews" field="totalReviews" />
+                    <SortableTh label="Address" field="address" />
+                    <SortableTh label="Phone" field="phone" />
+                    <SortableTh label="Website" field="website" />
                     {showSocials && (
                       <>
-                        <td>{item.socials?.email ?? "-"}</td>
-
-                        <td>
-                          {item.socials?.facebook ? (
-                            <a href={item.socials.facebook} target="_blank">
-                              FB
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td>
-                          {item.socials?.instagram ? (
-                            <a href={item.socials.instagram} target="_blank">
-                              IG
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td>
-                          {item.socials?.linkedin ? (
-                            <a href={item.socials.linkedin} target="_blank">
-                              IN
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td>
-                          {item.socials?.twitter ? (
-                            <a href={item.socials.twitter} target="_blank">
-                              TW
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td>
-                          {item.socials?.youtube ? (
-                            <a href={item.socials.youtube} target="_blank">
-                              YT
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
-
-                        <td>
-                          {item.socials?.tiktok ? (
-                            <a href={item.socials.tiktok} target="_blank">
-                              TT
-                            </a>
-                          ) : (
-                            "-"
-                          )}
-                        </td>
+                        <SortableTh label="Email" field="socials.email" />
+                        <SortableTh label="Facebook" field="socials.facebook" />
+                        <SortableTh
+                          label="Instagram"
+                          field="socials.instagram"
+                        />
+                        <SortableTh label="LinkedIn" field="socials.linkedin" />
+                        <SortableTh label="Twitter" field="socials.twitter" />
+                        <SortableTh label="YouTube" field="socials.youtube" />
+                        <SortableTh label="TikTok" field="socials.tiktok" />
                       </>
                     )}
-
-                    <td>
-                      <a href={item.url} target="_blank">
-                        Maps
-                      </a>
-                    </td>
+                    <th>Maps</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {pagedResults.map((item: any, index: number) => (
+                    <tr key={index}>
+                      <td>{(page - 1) * pageSize + index + 1}</td>
+                      <td>{item.name}</td>
+                      <td>{item.rating ?? "-"}</td>
+                      <td>{item.totalReviews ?? "-"}</td>
+                      <td>{item.address ?? "-"}</td>
+                      <td>{item.phone ?? "-"}</td>
+                      <td>
+                        {item.website ? (
+                          <a href={item.website} target="_blank">
+                            Link
+                          </a>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+
+                      {showSocials && (
+                        <>
+                          <td>{item.socials?.email ?? "-"}</td>
+
+                          <td>
+                            {item.socials?.facebook ? (
+                              <a href={item.socials.facebook} target="_blank">
+                                FB
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            {item.socials?.instagram ? (
+                              <a href={item.socials.instagram} target="_blank">
+                                IG
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            {item.socials?.linkedin ? (
+                              <a href={item.socials.linkedin} target="_blank">
+                                IN
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            {item.socials?.twitter ? (
+                              <a href={item.socials.twitter} target="_blank">
+                                TW
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            {item.socials?.youtube ? (
+                              <a href={item.socials.youtube} target="_blank">
+                                YT
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+
+                          <td>
+                            {item.socials?.tiktok ? (
+                              <a href={item.socials.tiktok} target="_blank">
+                                TT
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </td>
+                        </>
+                      )}
+
+                      <td>
+                        <a href={item.url} target="_blank">
+                          Maps
+                        </a>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             <div className="pagination">
               <div className="page-info">
