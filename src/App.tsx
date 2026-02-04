@@ -102,6 +102,8 @@ export default function App() {
   const [delay, setDelay] = useState(3);
   const [region, setRegion] = useState("vn");
   const [deepScan, setDeepScan] = useState(true);
+  const [deepScanWebsite, setDeepScanWebsite] = useState(true);
+
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [showSocials, setShowSocials] = useState(false);
@@ -193,6 +195,7 @@ export default function App() {
         delay,
         region,
         deepScan,
+        deepScanWebsite
       }),
     });
 
@@ -292,6 +295,18 @@ export default function App() {
               type="checkbox"
               checked={deepScan}
               onChange={() => setDeepScan(!deepScan)}
+            />
+            <span />
+          </label>
+        </div>
+
+        <div className="switch-row">
+          <span>Quét chi tiết website</span>
+          <label className="switch">
+            <input
+              type="checkbox"
+              checked={deepScanWebsite}
+              onChange={() => setDeepScanWebsite(!deepScanWebsite)}
             />
             <span />
           </label>
