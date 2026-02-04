@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import "./App.css";
 
 // const API_BASE = "http://localhost:3001/api";
-// 
+//
 const API_BASE = "https://tool-map-crawl-be-2.onrender.com/api";
 
 type Tab = "jobs" | "tasks" | "task-result";
-
+type SortOrder = "asc" | "desc";
 // ===== EXPORT HELPERS =====
 function downloadFile(content: string, filename: string, type: string) {
   const blob = new Blob([content], { type });
@@ -22,12 +22,21 @@ function downloadFile(content: string, filename: string, type: string) {
 
 function exportToTXT(task: any) {
   const lines = task.result.map((item: any, index: number) => {
+    const s = item.socials || {};
+
     return [
       `${index + 1}. ${item.name}`,
-      `Rating: ${item.rating ?? "-"} (${item.totalReviews ?? 0})`,
+      `Rating: ${item.rating ?? "-"} (${item.totalReviews ?? "-"})`,
       `Address: ${item.address ?? "-"}`,
       `Phone: ${item.phone ?? "-"}`,
       `Website: ${item.website ?? "-"}`,
+      `Email: ${s.email ?? "-"}`,
+      `Facebook: ${s.facebook ?? "-"}`,
+      `Instagram: ${s.instagram ?? "-"}`,
+      `LinkedIn: ${s.linkedin ?? "-"}`,
+      `Twitter: ${s.twitter ?? "-"}`,
+      `YouTube: ${s.youtube ?? "-"}`,
+      `TikTok: ${s.tiktok ?? "-"}`,
       `Maps: ${item.url}`,
       "--------------------------",
     ].join("\n");
@@ -48,18 +57,36 @@ function exportToCSV(task: any) {
     "Address",
     "Phone",
     "Website",
+    "Email",
+    "Facebook",
+    "Instagram",
+    "LinkedIn",
+    "Twitter",
+    "YouTube",
+    "TikTok",
     "Maps URL",
   ];
 
-  const rows = task.result.map((item: any) => [
-    `"${item.name ?? ""}"`,
-    item.rating ?? "",
-    item.totalReviews ?? "",
-    `"${item.address ?? ""}"`,
-    `"${item.phone ?? ""}"`,
-    `"${item.website ?? ""}"`,
-    `"${item.url ?? ""}"`,
-  ]);
+  const rows = task.result.map((item: any) => {
+    const s = item.socials || {};
+
+    return [
+      `"${item.name ?? ""}"`,
+      item.rating ?? "",
+      item.totalReviews ?? "",
+      `"${item.address ?? ""}"`,
+      `"${item.phone ?? ""}"`,
+      `"${item.website ?? ""}"`,
+      `"${s.email ?? ""}"`,
+      `"${s.facebook ?? ""}"`,
+      `"${s.instagram ?? ""}"`,
+      `"${s.linkedin ?? ""}"`,
+      `"${s.twitter ?? ""}"`,
+      `"${s.youtube ?? ""}"`,
+      `"${s.tiktok ?? ""}"`,
+      `"${item.url ?? ""}"`,
+    ];
+  });
 
   const csv =
     headers.join(",") + "\n" + rows.map((r: any) => r.join(",")).join("\n");
@@ -77,6 +104,7 @@ export default function App() {
   const [deepScan, setDeepScan] = useState(true);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [showSocials, setShowSocials] = useState(false);
 
   // ===== UI STATE =====
   const [tab, setTab] = useState<Tab>("jobs");
@@ -87,12 +115,39 @@ export default function App() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
 
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [errors, setErrors] = useState<{
     keyword?: boolean;
     address?: boolean;
     limit?: boolean;
   }>({});
 
+  function getValue(obj: any, path: string) {
+    return path.split(".").reduce((acc, key) => acc?.[key], obj);
+  }
+
+  function sortData(data: any[]) {
+    if (!sortKey) return data;
+
+    return [...data].sort((a, b) => {
+      const va = getValue(a, sortKey);
+      const vb = getValue(b, sortKey);
+
+      const ha = va !== null && va !== undefined && va !== "";
+      const hb = vb !== null && vb !== undefined && vb !== "";
+
+      // ❗ KHÔNG CÓ DATA = NHỎ NHẤT
+      if (ha === hb) return 0;
+      return sortOrder === "asc"
+        ? ha
+          ? 1
+          : -1 // asc: không có lên trước
+        : ha
+          ? -1
+          : 1; // desc: có lên trước
+    });
+  }
   // ===== API =====
   const fetchJobs = async () => {
     const res = await fetch(`${API_BASE}/crawl-jobs`);
@@ -152,7 +207,32 @@ export default function App() {
   const totalItems = results.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
-  const pagedResults = results.slice((page - 1) * pageSize, page * pageSize);
+  // const pagedResults = results.slice((page - 1) * pageSize, page * pageSize);
+  const sortedResults = sortData(results);
+
+  const pagedResults = sortedResults.slice(
+    (page - 1) * pageSize,
+    page * pageSize,
+  );
+
+  function SortableTh({ label, field }: { label: string; field: string }) {
+    return (
+      <th
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          if (sortKey === field) {
+            setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+          } else {
+            setSortKey(field);
+            setSortOrder("asc");
+          }
+        }}
+      >
+        {label}
+        {sortKey === field && (sortOrder === "asc" ? " ▲" : " ▼")}
+      </th>
+    );
+  }
   // ======================= UI =======================
   return (
     <div className="container">
@@ -317,53 +397,45 @@ export default function App() {
               Kết quả: {selectedTask.keyword}
               <button onClick={() => exportToCSV(selectedTask)}>⬇ Excel</button>
               <button onClick={() => exportToTXT(selectedTask)}>⬇ TXT</button>
+              <button
+                style={{ marginLeft: "auto" }}
+                onClick={() => setShowSocials(!showSocials)}
+              >
+                {showSocials ? "Ẩn social ▲" : "Xem thêm social ▼"}
+              </button>
             </h3>
 
             <table>
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Name</th>
-                  <th>Rating (totalReviews)</th>
-                  <th>Address</th>
-                  <th>Phone</th>
-                  <th>Website</th>
+                  <SortableTh label="Name" field="name" />
+                  <SortableTh label="Rating" field="rating" />
+                  <SortableTh label="Reviews" field="totalReviews" />
+                  <SortableTh label="Address" field="address" />
+                  <SortableTh label="Phone" field="phone" />
+                  <SortableTh label="Website" field="website" />
+                  {showSocials && (
+                    <>
+                      <SortableTh label="Email" field="socials.email" />
+                      <SortableTh label="Facebook" field="socials.facebook" />
+                      <SortableTh label="Instagram" field="socials.instagram" />
+                      <SortableTh label="LinkedIn" field="socials.linkedin" />
+                      <SortableTh label="Twitter" field="socials.twitter" />
+                      <SortableTh label="YouTube" field="socials.youtube" />
+                      <SortableTh label="TikTok" field="socials.tiktok" />
+                    </>
+                  )}
                   <th>Maps</th>
                 </tr>
               </thead>
               <tbody>
-                {/* {selectedTask.result?.map((item: any, index: number) => (
-                  <tr key={index}>
-                    <td>{index + 1}</td>
-                    <td>{item.name}</td>
-                    <td>
-                      {item.rating ?? "-"} ({item.totalReviews})
-                    </td>
-                    <td>{item.address ?? "-"}</td>
-                    <td>{item.phone ?? "-"}</td>
-                    <td>
-                      {item.website ? (
-                        <a href={item.website} target="_blank">
-                          Link
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td>
-                      <a href={item.url} target="_blank">
-                        Maps
-                      </a>
-                    </td>
-                  </tr>
-                ))} */}
                 {pagedResults.map((item: any, index: number) => (
                   <tr key={index}>
                     <td>{(page - 1) * pageSize + index + 1}</td>
                     <td>{item.name}</td>
-                    <td>
-                      {item.rating ?? "-"} ({item.totalReviews ?? "-"})
-                    </td>
+                    <td>{item.rating ?? "-"}</td>
+                    <td>{item.totalReviews ?? "-"}</td>
                     <td>{item.address ?? "-"}</td>
                     <td>{item.phone ?? "-"}</td>
                     <td>
@@ -375,6 +447,73 @@ export default function App() {
                         "-"
                       )}
                     </td>
+
+                    {showSocials && (
+                      <>
+                        <td>{item.socials?.email ?? "-"}</td>
+
+                        <td>
+                          {item.socials?.facebook ? (
+                            <a href={item.socials.facebook} target="_blank">
+                              FB
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+
+                        <td>
+                          {item.socials?.instagram ? (
+                            <a href={item.socials.instagram} target="_blank">
+                              IG
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+
+                        <td>
+                          {item.socials?.linkedin ? (
+                            <a href={item.socials.linkedin} target="_blank">
+                              IN
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+
+                        <td>
+                          {item.socials?.twitter ? (
+                            <a href={item.socials.twitter} target="_blank">
+                              TW
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+
+                        <td>
+                          {item.socials?.youtube ? (
+                            <a href={item.socials.youtube} target="_blank">
+                              YT
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+
+                        <td>
+                          {item.socials?.tiktok ? (
+                            <a href={item.socials.tiktok} target="_blank">
+                              TT
+                            </a>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                      </>
+                    )}
+
                     <td>
                       <a href={item.url} target="_blank">
                         Maps
