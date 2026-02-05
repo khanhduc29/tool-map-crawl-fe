@@ -289,7 +289,7 @@ export default function App() {
         </select>
 
         <div className="switch-row">
-          <span>Quét chi tiết</span>
+          <span>Quét chi tiết (đang triển khai)</span>
           <label className="switch">
             <input
               type="checkbox"
