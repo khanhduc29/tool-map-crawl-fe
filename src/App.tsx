@@ -106,7 +106,7 @@ export default function App() {
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [showSocials, setShowSocials] = useState(false);
+  const [onlyHasSocial, setOnlyHasSocial] = useState(false);
 
   // ===== UI STATE =====
   const [tab, setTab] = useState<Tab>("jobs");
@@ -124,6 +124,8 @@ export default function App() {
     address?: boolean;
     limit?: boolean;
   }>({});
+
+  const [selectedRow, setSelectedRow] = useState<any | null>(null);
 
   function getValue(obj: any, path: string) {
     return path.split(".").reduce((acc, key) => acc?.[key], obj);
@@ -195,7 +197,7 @@ export default function App() {
         delay,
         region,
         deepScan,
-        deepScanWebsite
+        deepScanWebsite,
       }),
     });
 
@@ -207,35 +209,33 @@ export default function App() {
     fetchJobs();
   }, []);
   const results = selectedTask?.result || [];
-  const totalItems = results.length;
-  const totalPages = Math.ceil(totalItems / pageSize);
-
-  // const pagedResults = results.slice((page - 1) * pageSize, page * pageSize);
   const sortedResults = sortData(results);
 
-  const pagedResults = sortedResults.slice(
+  const filteredResults = onlyHasSocial
+    ? sortedResults.filter(hasAnySocial)
+    : sortedResults;
+
+  const pagedResults = filteredResults.slice(
     (page - 1) * pageSize,
     page * pageSize,
   );
 
-  function SortableTh({ label, field }: { label: string; field: string }) {
-    return (
-      <th
-        style={{ cursor: "pointer" }}
-        onClick={() => {
-          if (sortKey === field) {
-            setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-          } else {
-            setSortKey(field);
-            setSortOrder("asc");
-          }
-        }}
-      >
-        {label}
-        {sortKey === field && (sortOrder === "asc" ? " ▲" : " ▼")}
-      </th>
+  const totalItems = filteredResults.length;
+  const totalPages = Math.ceil(totalItems / pageSize);
+
+  function hasAnySocial(item: any) {
+    const s = item.socials || {};
+    return Boolean(
+      s.email ||
+      s.facebook ||
+      s.instagram ||
+      s.linkedin ||
+      s.twitter ||
+      s.youtube ||
+      s.tiktok,
     );
   }
+
   // ======================= UI =======================
   return (
     <div className="container">
@@ -343,8 +343,11 @@ export default function App() {
             <table>
               <thead>
                 <tr>
-                  <th>Job ID</th>
-                  <th>Keyword</th>
+                  <th>Keywords</th>
+                  <th>Limit</th>
+                  <th>Address</th>
+                  {/* <th>Deep scan</th> */}
+                  <th>Deep website</th>
                   <th>Status</th>
                   <th></th>
                 </tr>
@@ -352,9 +355,47 @@ export default function App() {
               <tbody>
                 {jobs.map((job) => (
                   <tr key={job.id}>
-                    <td>{job.id.slice(0, 8)}</td>
-                    <td>{job.raw_keywords}</td>
+                    {/* raw_keywords */}
+                    <td>
+                      <div className="truncate-sm" title={job.raw_keywords}>
+                        {job.raw_keywords}
+                      </div>
+                    </td>
+
+                    {/* total_limit */}
+                    <td>{job.total_limit}</td>
+
+                    {/* address */}
+                    <td>
+                      <div className="truncate" title={job.address}>
+                        {job.address}
+                      </div>
+                    </td>
+
+                    {/* deep_scan */}
+                    {/* <td>
+                      <span
+                        className={job.deep_scan ? "check-yes" : "check-no"}
+                      >
+                        {job.deep_scan ? "✔" : "✖"}
+                      </span>
+                    </td> */}
+
+                    {/* deep_scan_website */}
+                    <td>
+                      <span
+                        className={
+                          job.deep_scan_website ? "check-yes" : "check-no"
+                        }
+                      >
+                        {job.deep_scan_website ? "✔" : "✖"}
+                      </span>
+                    </td>
+
+                    {/* status */}
                     <td>{job.status}</td>
+
+                    {/* action */}
                     <td>
                       <button
                         onClick={() => {
@@ -418,9 +459,12 @@ export default function App() {
               <button onClick={() => exportToTXT(selectedTask)}>⬇ TXT</button>
               <button
                 style={{ marginLeft: "auto" }}
-                onClick={() => setShowSocials(!showSocials)}
+                onClick={() => {
+                  setOnlyHasSocial(!onlyHasSocial);
+                  setPage(1);
+                }}
               >
-                {showSocials ? "Ẩn social ▲" : "Xem thêm social ▼"}
+                {onlyHasSocial ? "Hiển thị tất cả" : "Chỉ hiển thị có social"}
               </button>
             </h3>
 
@@ -429,118 +473,44 @@ export default function App() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <SortableTh label="Name" field="name" />
-                    <SortableTh label="Rating" field="rating" />
-                    <SortableTh label="Reviews" field="totalReviews" />
-                    <SortableTh label="Address" field="address" />
-                    <SortableTh label="Phone" field="phone" />
-                    <SortableTh label="Website" field="website" />
-                    {showSocials && (
-                      <>
-                        <SortableTh label="Email" field="socials.email" />
-                        <SortableTh label="Facebook" field="socials.facebook" />
-                        <SortableTh
-                          label="Instagram"
-                          field="socials.instagram"
-                        />
-                        <SortableTh label="LinkedIn" field="socials.linkedin" />
-                        <SortableTh label="Twitter" field="socials.twitter" />
-                        <SortableTh label="YouTube" field="socials.youtube" />
-                        <SortableTh label="TikTok" field="socials.tiktok" />
-                      </>
-                    )}
+                    <th>Name</th>
+                    <th>Phone</th>
                     <th>Maps</th>
+                    <th>Chi tiết</th>
                   </tr>
                 </thead>
                 <tbody>
                   {pagedResults.map((item: any, index: number) => (
                     <tr key={index}>
                       <td>{(page - 1) * pageSize + index + 1}</td>
-                      <td>{item.name}</td>
-                      <td>{item.rating ?? "-"}</td>
-                      <td>{item.totalReviews ?? "-"}</td>
-                      <td>{item.address ?? "-"}</td>
-                      <td>{item.phone ?? "-"}</td>
+
+                      {/* NAME */}
+                      {/* <td>{item.name}</td> */}
                       <td>
-                        {item.website ? (
-                          <a href={item.website} target="_blank">
-                            Link
-                          </a>
-                        ) : (
-                          "-"
-                        )}
+                        <div className="truncate-sm" title={item.name}>
+                          {item.name ?? "-"}
+                        </div>
                       </td>
 
-                      {showSocials && (
-                        <>
-                          <td>{item.socials?.email ?? "-"}</td>
+                      {/* PHONE */}
+                      <td>
+                        <div className="truncate-sm" title={item.phone}>
+                          {item.phone ?? "-"}
+                        </div>
+                      </td>
 
-                          <td>
-                            {item.socials?.facebook ? (
-                              <a href={item.socials.facebook} target="_blank">
-                                FB
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            {item.socials?.instagram ? (
-                              <a href={item.socials.instagram} target="_blank">
-                                IG
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            {item.socials?.linkedin ? (
-                              <a href={item.socials.linkedin} target="_blank">
-                                IN
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            {item.socials?.twitter ? (
-                              <a href={item.socials.twitter} target="_blank">
-                                TW
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            {item.socials?.youtube ? (
-                              <a href={item.socials.youtube} target="_blank">
-                                YT
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-
-                          <td>
-                            {item.socials?.tiktok ? (
-                              <a href={item.socials.tiktok} target="_blank">
-                                TT
-                              </a>
-                            ) : (
-                              "-"
-                            )}
-                          </td>
-                        </>
-                      )}
-
+                      {/* MAPS */}
                       <td>
                         <a href={item.url} target="_blank">
                           Maps
                         </a>
+                      </td>
+
+                      {/* DETAIL */}
+                      <td>
+                        <button onClick={() => setSelectedRow(item)}>
+                          👁 Xem
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -596,6 +566,85 @@ export default function App() {
           </>
         )}
       </div>
+      {selectedRow && (
+        <div className="modal-overlay" onClick={() => setSelectedRow(null)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            {/* HEADER */}
+            <div className="modal-header">
+              <h2>{selectedRow.name}</h2>
+              <button
+                className="close-btn"
+                onClick={() => setSelectedRow(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* INFO GRID */}
+            <div className="modal-grid">
+              <div>
+                <span className="label">Rating</span>
+                <span>{selectedRow.rating ?? "-"}</span>
+              </div>
+
+              <div>
+                <span className="label">Reviews</span>
+                <span>{selectedRow.totalReviews ?? "-"}</span>
+              </div>
+
+              <div className="full">
+                <span className="label">Address</span>
+                <span>{selectedRow.address}</span>
+              </div>
+
+              <div>
+                <span className="label">Phone</span>
+                <span>{selectedRow.phone}</span>
+              </div>
+
+              {selectedRow.website && (
+                <div className="full">
+                  <span className="label">Website</span>
+                  <a href={selectedRow.website} target="_blank">
+                    {selectedRow.website}
+                  </a>
+                </div>
+              )}
+
+              <div className="full">
+                <span className="label">Email</span>
+                <span>{selectedRow.socials?.email ?? "-"}</span>
+              </div>
+            </div>
+
+            {/* SOCIAL */}
+            <div className="socials">
+              {selectedRow.socials?.facebook && (
+                <a href={selectedRow.socials.facebook} target="_blank">
+                  FB
+                </a>
+              )}
+              {selectedRow.socials?.instagram && (
+                <a href={selectedRow.socials.instagram} target="_blank">
+                  IG
+                </a>
+              )}
+              {selectedRow.socials?.linkedin && (
+                <a href={selectedRow.socials.linkedin} target="_blank">
+                  IN
+                </a>
+              )}
+            </div>
+
+            {/* FOOTER */}
+            <div className="modal-footer">
+              <a href={selectedRow.url} target="_blank" className="maps-btn">
+                📍 Mở Google Maps
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
