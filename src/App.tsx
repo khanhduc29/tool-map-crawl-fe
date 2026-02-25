@@ -613,7 +613,22 @@ export default function App() {
 
               <div className="full">
                 <span className="label">Email</span>
-                <span>{selectedRow.socials?.email ?? "-"}</span>
+
+                {selectedRow.socials?.emails?.length ? (
+                  <div className="email-list">
+                    {selectedRow.socials.emails.map((email: any, idx: any) => (
+                      <a
+                        key={idx}
+                        href={`mailto:${email}`}
+                        className="email-item"
+                      >
+                        {email}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <span>-</span>
+                )}
               </div>
             </div>
 
