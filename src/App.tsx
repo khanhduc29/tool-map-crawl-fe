@@ -125,6 +125,17 @@ export default function App() {
     limit?: boolean;
   }>({});
 
+  const PAGE_SIZE = 10;
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const totalPagess = Math.ceil(jobs.length / PAGE_SIZE);
+
+  const paginatedJobs = jobs.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
+  );
+
   const [selectedRow, setSelectedRow] = useState<any | null>(null);
 
   function getValue(obj: any, path: string) {
@@ -208,6 +219,9 @@ export default function App() {
   useEffect(() => {
     fetchJobs();
   }, []);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [jobs]);
   const results = selectedTask?.result || [];
   const sortedResults = sortData(results);
 
@@ -353,7 +367,7 @@ export default function App() {
                 </tr>
               </thead>
               <tbody>
-                {jobs.map((job) => (
+                {paginatedJobs.map((job) => (
                   <tr key={job.id}>
                     {/* raw_keywords */}
                     <td>
@@ -411,6 +425,37 @@ export default function App() {
                 ))}
               </tbody>
             </table>
+            {/* PAGINATION */}
+            {totalPagess > 1 && (
+              <div className="pagination">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => p - 1)}
+                >
+                  ← Prev
+                </button>
+    
+                {Array.from({ length: totalPagess }).map((_, i) => {
+                  const page = i + 1;
+                  return (
+                    <button
+                      key={page}
+                      className={page === currentPage ? "active" : ""}
+                      onClick={() => setCurrentPage(page)}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+    
+                <button
+                  disabled={currentPage === totalPagess}
+                  onClick={() => setCurrentPage((p) => p + 1)}
+                >
+                  Next →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
