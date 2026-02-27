@@ -4,6 +4,7 @@ import { TikTokAccount } from "../../types/tiktok";
 import { FAKE_ACCOUNTS } from "../../data/tiktokAccounts";
 import { ScanType } from "../../types/tiktokResult";
 import ResultList from "../../components/tiktok/ResultList";
+import { MOCK_DATA_BY_TAB } from "../../data/mockByTab";
 
 type TabKey = "top-posts" | "videos" | "accounts" | "friends" | "creators";
 
@@ -19,8 +20,11 @@ export default function TikTokTool() {
   const [scanType, setScanType] = useState<ScanType | null>(null);
   const [results, setResults] = useState<any[]>([]);
   useEffect(() => {
-    setResults([]);
-    setScanType(null);
+    const mock = MOCK_DATA_BY_TAB[tab];
+    if (!mock) return;
+
+    setScanType(mock.scanType as ScanType);
+    setResults([...mock.results]); // 👈 clone → mutable
   }, [tab]);
   const buildScanUsersForm = () => {
     const form = {
@@ -220,12 +224,8 @@ export default function TikTokTool() {
 
         {/* RIGHT RESULT */}
         <div style={right}>
-  <ResultList
-    scanType={scanType}
-    results={results}
-    limit={limit}
-  />
-</div>
+          <ResultList scanType={scanType} results={results} limit={limit} />
+        </div>
       </div>
     </div>
   );
