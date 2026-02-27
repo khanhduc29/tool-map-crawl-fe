@@ -7,6 +7,12 @@
   padding: 18px;
   margin-bottom: 14px;
 }
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+};
 
 .account-avatar {
   width: 64px;

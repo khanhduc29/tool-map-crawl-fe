@@ -16,7 +16,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
   // ✅ reset page khi đổi data hoặc scanType
   useEffect(() => {
     setPage(1);
-  }, [results, scanType, limit]);
+}, [results, scanType, limit]);
 
   // ✅ cắt data theo page + limit
   const pagedData = useMemo(() => {

@@ -8,7 +8,15 @@ type Props = {
 export default function AccountCard({ data }: Props) {
   return (
     <div className="account-card">
-      <img src="/bieu-tuong-tiktok-3.jpg" className="account-avatar" />
+      <img
+        src={data.avatar_url || "/bieu-tuong-tiktok-3.jpg"}
+        alt={data.username}
+        className="avatar"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).src =
+            "/bieu-tuong-tiktok-3.jpg";
+        }}
+      />
 
       <div className="account-content">
         <strong>@{data.username}</strong>

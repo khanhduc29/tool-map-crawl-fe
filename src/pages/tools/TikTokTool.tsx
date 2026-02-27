@@ -11,7 +11,7 @@ type TabKey = "top-posts" | "videos" | "accounts" | "friends" | "creators";
 export default function TikTokTool() {
   const [tab, setTab] = useState<TabKey>("top-posts");
   const [accountKeyword, setAccountKeyword] = useState("");
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(3);
   const [deepScan, setDeepScan] = useState(true);
 
   const [sourceUsername, setSourceUsername] = useState("");
@@ -249,72 +249,10 @@ function Tab({ label, value, tab, setTab, onChange }: any) {
     </button>
   );
 }
-function AccountCard({ data }: { data: TikTokAccount }) {
-  return (
-    <div style={accountCard}>
-      <img src="/bieu-tuong-tiktok-3.jpg" style={avatar} />
-
-      <div style={{ flex: 1 }}>
-        <strong>@{data.username}</strong>
-        <div style={{ opacity: 0.8 }}>{data.display_name}</div>
-
-        <p style={{ fontSize: 13, opacity: 0.7, whiteSpace: "pre-line" }}>
-          {data.bio}
-        </p>
-
-        <div style={stats}>
-          <span>
-            <Users size={14} /> {data.follower_count.toLocaleString()}
-          </span>
-          <span>
-            <UserPlus size={14} /> {data.following_count.toLocaleString()}
-          </span>
-        </div>
-
-        <a
-          href={data.profile_url}
-          target="_blank"
-          rel="noreferrer"
-          style={profileLink}
-        >
-          Xem profile →
-        </a>
-      </div>
-    </div>
-  );
-}
 
 /* ================= STYLES ================= */
-const accountCard = {
-  display: "flex",
-  gap: 14,
-  background: "#111",
-  borderRadius: 18,
-  padding: 18,
-  marginBottom: 14,
-};
 
-const avatar = {
-  width: 64,
-  height: 64,
-  borderRadius: "50%",
-  objectFit: "cover" as const,
-};
 
-const stats = {
-  display: "flex",
-  gap: 16,
-  marginTop: 6,
-  fontSize: 13,
-};
-
-const profileLink = {
-  display: "inline-block",
-  marginTop: 8,
-  color: "#FF4331",
-  fontSize: 13,
-  textDecoration: "none",
-};
 const page = {
   padding: 60,
   minHeight: "100vh",
