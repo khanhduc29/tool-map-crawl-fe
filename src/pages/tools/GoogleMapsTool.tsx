@@ -679,7 +679,7 @@ export default function App() {
             </div>
 
             {/* SOCIAL */}
-            <div className="socials">
+            <div className="socialsa">
               {selectedRow.socials?.facebook && (
                 <a href={selectedRow.socials.facebook} target="_blank">
                   FB
