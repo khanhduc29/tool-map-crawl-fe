@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import { Users, UserPlus } from "lucide-react";
 import { TikTokAccount } from "../../types/tiktok";
-import { FAKE_ACCOUNTS } from "../../data/tiktokAccounts";
+import { FAKE_ACCOUNTS, FAKE_COMMENTS } from "../../data/tiktokAccounts";
 import { ScanType } from "../../types/tiktokResult";
 import ResultList from "../../components/tiktok/ResultList";
 import { MOCK_DATA_BY_TAB } from "../../data/mockByTab";
 
-type TabKey = "top-posts" | "videos" | "accounts" | "friends" | "creators";
+type TabKey =
+  | "top-posts"
+  | "videos"
+  | "accounts"
+  | "friends"
+  | "creators"
+  | "comments";
 
 export default function TikTokTool() {
   const [tab, setTab] = useState<TabKey>("top-posts");
@@ -19,6 +25,12 @@ export default function TikTokTool() {
   const [relationDeepScan, setRelationDeepScan] = useState(false);
   const [scanType, setScanType] = useState<ScanType | null>(null);
   const [results, setResults] = useState<any[]>([]);
+
+  // ===== COMMENTS SCAN =====
+  const [commentKeyword, setCommentKeyword] = useState("");
+  const [commentVideoUrl, setCommentVideoUrl] = useState("");
+  const [commentLimit, setCommentLimit] = useState(200);
+
   useEffect(() => {
     const mock = MOCK_DATA_BY_TAB[tab];
     if (!mock) return;
@@ -62,6 +74,29 @@ export default function TikTokTool() {
     setScanType("relations"); // 👈
     setResults([]); // sau này thay bằng FAKE_RELATIONS
   };
+
+  const buildScanCommentsForm = () => {
+    const form = {
+      scan_type: "comments",
+      scan_account: "tool_bot_01",
+
+      keyword: commentKeyword,
+      video_url: commentVideoUrl,
+      limit: commentLimit,
+
+      delay_range: [2000, 4000],
+      batch_size: 20,
+      batch_delay: 10000,
+
+      detect_intent: true,
+    };
+
+    console.log("📤 SCAN COMMENTS FORM:", form);
+
+    setScanType("comments"); // 👈 QUAN TRỌNG
+    setResults([]);
+  };
+
   return (
     <div style={page}>
       {/* HEADER */}
@@ -99,6 +134,12 @@ export default function TikTokTool() {
         <Tab
           label="Creator theo khu vực"
           value="creators"
+          tab={tab}
+          setTab={setTab}
+        />
+        <Tab
+          label="Quét bình luận bài đăng"
+          value="comments"
           tab={tab}
           setTab={setTab}
         />
@@ -220,6 +261,38 @@ export default function TikTokTool() {
               <button style={btn}>Tìm creator</button>
             </>
           )}
+          {tab === "comments" && (
+            <>
+              <h2>Quét bình luận bài đăng</h2>
+              <p>Lọc comment theo keyword trong video</p>
+
+              <input
+                style={inputStyle}
+                placeholder="Keyword (vd: makeup)"
+                value={commentKeyword}
+                onChange={(e) => setCommentKeyword(e.target.value)}
+              />
+
+              <input
+                style={inputStyle}
+                placeholder="TikTok video URL"
+                value={commentVideoUrl}
+                onChange={(e) => setCommentVideoUrl(e.target.value)}
+              />
+
+              <input
+                style={inputStyle}
+                type="number"
+                placeholder="Số lượng comment (vd: 200)"
+                value={commentLimit}
+                onChange={(e) => setCommentLimit(Number(e.target.value))}
+              />
+
+              <button style={btn} onClick={buildScanCommentsForm}>
+                Quét bình luận
+              </button>
+            </>
+          )}
         </div>
 
         {/* RIGHT RESULT */}
@@ -251,7 +324,6 @@ function Tab({ label, value, tab, setTab, onChange }: any) {
 }
 
 /* ================= STYLES ================= */
-
 
 const page = {
   padding: 60,

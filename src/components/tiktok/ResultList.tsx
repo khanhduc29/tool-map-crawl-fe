@@ -16,7 +16,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
   // ✅ reset page khi đổi data hoặc scanType
   useEffect(() => {
     setPage(1);
-}, [results, scanType, limit]);
+  }, [results, scanType, limit]);
 
   // ✅ cắt data theo page + limit
   const pagedData = useMemo(() => {
@@ -30,6 +30,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
 
   switch (scanType) {
     case "search_users":
+    case "relations":
       return (
         <>
           {(pagedData as TikTokAccount[]).map((acc) => (
@@ -45,13 +46,45 @@ export default function ResultList({ scanType, results, limit }: Props) {
           />
         </>
       );
-
-    case "relations":
-      return <div>TODO: Render relations</div>;
-
     case "search_videos":
       return <div>TODO: Render videos</div>;
+    case "comments":
+      return (
+        <>
+          {pagedData.map((c: any, idx) => (
+            <div key={idx} className="account-card">
+              <div className="account-content">
+                <strong>{c.display_name}</strong>
 
+                <p style={{ margin: "6px 0", opacity: 0.9 }}>{c.comment}</p>
+
+                <div className="account-stats">
+                  ❤️ {c.likes}
+                  <span>{c.date}</span>
+                </div>
+
+                {c.profile_url && (
+                  <a
+                    className="profile-link"
+                    href={c.profile_url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                   Xem profile →
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+
+          <Pagination
+            page={page}
+            total={results.length}
+            limit={limit}
+            onPageChange={setPage}
+          />
+        </>
+      );
     default:
       return <div>Không hỗ trợ kiểu dữ liệu này</div>;
   }
