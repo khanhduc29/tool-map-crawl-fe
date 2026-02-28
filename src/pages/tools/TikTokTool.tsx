@@ -131,12 +131,12 @@ export default function TikTokTool() {
           tab={tab}
           setTab={setTab}
         />
-        <Tab
+        {/* <Tab
           label="Creator theo khu vực"
           value="creators"
           tab={tab}
           setTab={setTab}
-        />
+        /> */}
         <Tab
           label="Quét bình luận bài đăng"
           value="comments"
