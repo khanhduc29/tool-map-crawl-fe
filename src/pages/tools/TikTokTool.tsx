@@ -109,12 +109,12 @@ export default function TikTokTool() {
       {/* TABS */}
       <div style={tabs}>
         <Tab label="Top bài viết" value="top-posts" tab={tab} setTab={setTab} />
-        <Tab
+        {/* <Tab
           label="Video theo từ khóa"
           value="videos"
           tab={tab}
           setTab={setTab}
-        />
+        /> */}
         <Tab
           label="Tài khoản theo từ khóa"
           value="accounts"
@@ -165,7 +165,7 @@ export default function TikTokTool() {
             </>
           )}
 
-          {tab === "videos" && (
+          {/* {tab === "videos" && (
             <>
               <h2>Quét video theo từ khóa</h2>
               <p>Tìm video mới hoặc nhiều lượt xem</p>
@@ -178,7 +178,7 @@ export default function TikTokTool() {
 
               <button style={btn}>Bắt đầu quét</button>
             </>
-          )}
+          )} */}
 
           {tab === "accounts" && (
             <>
