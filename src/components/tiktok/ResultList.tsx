@@ -3,6 +3,7 @@ import AccountCard from "./AccountCard";
 import Pagination from "./Pagination";
 import { ScanType } from "../../types/tiktokResult";
 import { TikTokAccount } from "../../types/tiktok";
+import VideoCard, { TikTokVideo } from "./VideoCard";
 
 type Props = {
   scanType: ScanType | null;
@@ -28,64 +29,79 @@ export default function ResultList({ scanType, results, limit }: Props) {
     return <div style={{ opacity: 0.7 }}>Chưa có dữ liệu</div>;
   }
 
-  switch (scanType) {
-    case "search_users":
-    case "relations":
-      return (
-        <>
-          {(pagedData as TikTokAccount[]).map((acc) => (
-            <AccountCard key={acc.username} data={acc} />
-          ))}
+  return (
+    <div className="result-list-root">
+      {/* ===== SCROLL AREA (CHỈ LIST) ===== */}
+      <div className="result-list-scroll">
+        {(() => {
+          switch (scanType) {
+            case "search_users":
+            case "relations":
+              return (
+                <>
+                  {(pagedData as TikTokAccount[]).map((acc) => (
+                    <AccountCard key={acc.username} data={acc} />
+                  ))}
+                </>
+              );
 
-          {/* ✅ PHÂN TRANG Ở ĐÂY */}
-          <Pagination
-            page={page}
-            total={results.length}
-            limit={limit}
-            onPageChange={setPage}
-          />
-        </>
-      );
-    case "search_videos":
-      return <div>TODO: Render videos</div>;
-    case "comments":
-      return (
-        <>
-          {pagedData.map((c: any, idx) => (
-            <div key={idx} className="account-card">
-              <div className="account-content">
-                <strong>{c.display_name}</strong>
+            case "comments":
+              return (
+                <>
+                  {pagedData.map((c: any, idx) => (
+                    <div key={idx} className="account-card">
+                      <div className="account-content">
+                        <strong>{c.display_name}</strong>
 
-                <p style={{ margin: "6px 0", opacity: 0.9 }}>{c.comment}</p>
+                        <p style={{ margin: "6px 0", opacity: 0.9 }}>
+                          {c.comment}
+                        </p>
 
-                <div className="account-stats">
-                  ❤️ {c.likes}
-                  <span>{c.date}</span>
-                </div>
+                        <div className="account-stats">
+                          ❤️ {c.likes}
+                          <span>{c.date}</span>
+                        </div>
 
-                {c.profile_url && (
-                  <a
-                    className="profile-link"
-                    href={c.profile_url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                   Xem profile →
-                  </a>
-                )}
-              </div>
-            </div>
-          ))}
+                        {c.profile_url && (
+                          <a
+                            className="profile-link"
+                            href={c.profile_url}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Xem profile →
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              );
 
-          <Pagination
-            page={page}
-            total={results.length}
-            limit={limit}
-            onPageChange={setPage}
-          />
-        </>
-      );
-    default:
-      return <div>Không hỗ trợ kiểu dữ liệu này</div>;
-  }
+            case "top-posts":
+              return (
+                <>
+                  {(pagedData as TikTokVideo[]).map((video) => (
+                    <VideoCard key={video.video_id} data={video} />
+                  ))}
+                </>
+              );
+
+            default:
+              return <div>Không hỗ trợ kiểu dữ liệu này</div>;
+          }
+        })()}
+      </div>
+
+      {/* ===== PAGINATION (KHÔNG SCROLL) ===== */}
+      <div className="result-list-pagination">
+        <Pagination
+          page={page}
+          total={results.length}
+          limit={limit}
+          onPageChange={setPage}
+        />
+      </div>
+    </div>
+  );
 }

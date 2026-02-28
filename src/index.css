@@ -12,3 +12,23 @@ body {
   background: #f5f7fb;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ===== ResultList scroll + fixed pagination ===== */
+
+.result-list-root {
+  height: 100%;              /* ⬅️ QUAN TRỌNG */
+  display: flex;
+  flex-direction: column;
+}
+
+.result-list-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.result-list-pagination {
+  border-top: 1px solid #1e293b;
+  padding: 10px 0;
+  background: #020617;
+}

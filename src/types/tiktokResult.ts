@@ -1,9 +1,9 @@
 export type ScanType =
   | "search_users"
   | "relations"
-  | "search_videos"
   | "creator_by_region"
   | "comments"
+  | "top-posts"
 
 
 export type ScanResult<T> = {
