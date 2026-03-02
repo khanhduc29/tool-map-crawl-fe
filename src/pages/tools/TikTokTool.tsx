@@ -25,7 +25,7 @@ const TAB_TO_SCAN_TYPE: Record<TabKey, ScanType | null> = {
 export default function TikTokTool() {
   const [tab, setTab] = useState<TabKey>("top_posts");
   const [accountKeyword, setAccountKeyword] = useState("");
-  const [pageSize, setPageSize] = useState(3); 
+  const [pageSize, setPageSize] = useState(3);
   const [limitUsers, setLimitUsers] = useState(3);
   const [deepScan, setDeepScan] = useState(true);
 
@@ -43,18 +43,24 @@ export default function TikTokTool() {
   const [topKeyword, setTopKeyword] = useState("");
   const [topLimit, setTopLimit] = useState(3);
 
+
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const scanType = TAB_TO_SCAN_TYPE[tab];
-    if (scanType) {
-      fetchLatestTask(scanType);
-    } else {
-      setResults([]);
-      setScanType(null);
+    const nextScanType = TAB_TO_SCAN_TYPE[tab];
+
+    // 🔥 reset NGAY
+    setResults([]);
+    setScanType(nextScanType);
+
+    if (nextScanType) {
+      fetchLatestTask(nextScanType);
     }
   }, [tab]);
 
   async function submitScan(form: any) {
     try {
+      setLoading(true);
       setResults([]);
 
       const res = await fetch(`${API_BASE_URL}/api/tiktok/scan`, {
@@ -72,6 +78,7 @@ export default function TikTokTool() {
       console.log("✅ SCAN RESPONSE:", data);
     } catch (err) {
       console.error("❌ SCAN ERROR:", err);
+      setLoading(false);
     }
   }
 
@@ -79,26 +86,34 @@ export default function TikTokTool() {
     if (!scanType) return;
 
     try {
+      setLoading(true);
+
       const res = await fetch(
         `${API_BASE_URL}/api/tiktok/task/latest?scan_type=${scanType}&status=success`,
       );
 
-      if (!res.ok) throw new Error("Fetch latest task failed");
+      if (!res.ok) return;
 
       const json = await res.json();
 
-      if (json?.data?.result) {
-        setScanType(scanType);
+      // ❌ nếu scanType đã đổi trong lúc fetch
+      setResults((prev) => {
+        if (scanType !== TAB_TO_SCAN_TYPE[tab]) {
+          return prev;
+        }
 
         if (scanType === "relations") {
-          setResults(json.data.result.friends_detail || []);
-        } else {
-          setResults(json.data.result || []);
+          return json?.data?.result?.friends_detail || [];
         }
-      }
+
+        return json?.data?.result || [];
+      });
     } catch (err) {
       console.error("❌ FETCH LATEST TASK ERROR:", err);
-    }
+    } finally {
+    setLoading(false);
+  }
+
   }
 
   const buildScanTopPostsForm = () => {
@@ -392,8 +407,21 @@ export default function TikTokTool() {
 
         {/* RIGHT RESULT */}
         <div style={right}>
-          <ResultList scanType={scanType} results={results} pageSize={pageSize} />
-        </div>
+  {loading && <LoadingPanel />}
+
+  {!loading && results.length === 0 && (
+    <EmptyState scanType={scanType} />
+  )}
+
+  {!loading && results.length > 0 && (
+    <ResultList
+      key={scanType}
+      scanType={scanType}
+      results={results}
+      pageSize={pageSize}
+    />
+  )}
+</div>
       </div>
     </div>
   );
@@ -479,3 +507,41 @@ const btn = {
   borderRadius: 12,
   cursor: "pointer",
 };
+const loadingWrap = {
+  minHeight: 360,
+  display: "flex",
+  flexDirection: "column" as const,
+  justifyContent: "center",
+  alignItems: "center",
+  color: "#fff",
+};
+
+const spinner = {
+  width: 42,
+  height: 42,
+  border: "4px solid rgba(255,255,255,0.25)",
+  borderTop: "4px solid #FF4331",
+  borderRadius: "50%",
+  animation: "spin 1s linear infinite",
+};
+function LoadingPanel() {
+  return (
+    <div style={loadingWrap}>
+      <div style={spinner} />
+      <p style={{ marginTop: 12, opacity: 0.85 }}>
+        Đang quét dữ liệu, vui lòng chờ...
+      </p>
+    </div>
+  );
+}
+function EmptyState({ scanType }: { scanType: ScanType | null }) {
+  return (
+    <div style={loadingWrap}>
+      <p style={{ opacity: 0.7 }}>
+        {scanType
+          ? "Chưa có dữ liệu. Hãy bấm quét để bắt đầu."
+          : "Chọn một tab để xem kết quả."}
+      </p>
+    </div>
+  );
+}
