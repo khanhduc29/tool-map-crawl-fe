@@ -35,7 +35,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
       <div className="result-list-scroll">
         {(() => {
           switch (scanType) {
-            case "search_users":
+            case "users":
             case "relations":
               return (
                 <>
@@ -45,7 +45,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
                 </>
               );
 
-            case "comments":
+            case "video_comments":
               return (
                 <>
                   {pagedData.map((c: any, idx) => (
@@ -78,7 +78,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
                 </>
               );
 
-            case "top-posts":
+            case "top_posts":
               return (
                 <>
                   {(pagedData as TikTokVideo[]).map((video) => (

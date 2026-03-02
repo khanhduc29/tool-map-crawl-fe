@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "../../App.css";
 
 // const API_BASE = "http://localhost:3001/api";
-//
-const API_BASE = "https://tool-map-crawl-be-2.onrender.com/api";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+// const API_BASE = "https://tool-map-crawl-be-2.onrender.com/api";
 
 type Tab = "jobs" | "tasks" | "task-result";
 type SortOrder = "asc" | "desc";
@@ -165,19 +165,19 @@ export default function App() {
   }
   // ===== API =====
   const fetchJobs = async () => {
-    const res = await fetch(`${API_BASE}/crawl-jobs`);
+    const res = await fetch(`${API_BASE}/api/crawl-jobs`);
     const json = await res.json();
     setJobs(json.data || []);
   };
 
   const fetchTasks = async (jobId: string) => {
-    const res = await fetch(`${API_BASE}/crawl-tasks?jobId=${jobId}`);
+    const res = await fetch(`${API_BASE}/api/crawl-tasks?jobId=${jobId}`);
     const json = await res.json();
     setTasks(json.data || []);
   };
 
   const fetchTaskDetail = async (taskId: string) => {
-    const res = await fetch(`${API_BASE}/crawl-tasks/${taskId}`);
+    const res = await fetch(`${API_BASE}/api/crawl-tasks/${taskId}`);
     const json = await res.json();
 
     setSelectedTask(json.data);
@@ -198,7 +198,7 @@ export default function App() {
       return;
     }
 
-    await fetch(`${API_BASE}/crawl-jobs`, {
+    await fetch(`${API_BASE}/api/crawl-jobs`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

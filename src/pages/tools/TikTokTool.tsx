@@ -1,27 +1,35 @@
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Users, UserPlus } from "lucide-react";
 import { TikTokAccount } from "../../types/tiktok";
 import { FAKE_ACCOUNTS, FAKE_COMMENTS } from "../../data/tiktokAccounts";
 import { ScanType } from "../../types/tiktokResult";
 import ResultList from "../../components/tiktok/ResultList";
 import { MOCK_DATA_BY_TAB } from "../../data/mockByTab";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type TabKey =
-  | "top-posts"
+  | "top_posts"
   | "videos"
   | "accounts"
   | "friends"
   | "creators"
-  | "comments";
-
+  | "video_comments";
+const TAB_TO_SCAN_TYPE: Record<TabKey, ScanType | null> = {
+  top_posts: "top_posts",
+  videos: null,
+  accounts: "users",
+  friends: "relations",
+  creators: null,
+  video_comments: "video_comments",
+};
 export default function TikTokTool() {
-  const [tab, setTab] = useState<TabKey>("top-posts");
+  const [tab, setTab] = useState<TabKey>("top_posts");
   const [accountKeyword, setAccountKeyword] = useState("");
   const [limit, setLimit] = useState(3);
   const [deepScan, setDeepScan] = useState(true);
 
   const [sourceUsername, setSourceUsername] = useState("");
-  const [relationLimit, setRelationLimit] = useState(50);
+  const [relationLimit, setRelationLimit] = useState(20);
   const [relationDeepScan, setRelationDeepScan] = useState(false);
   const [scanType, setScanType] = useState<ScanType | null>(null);
   const [results, setResults] = useState<any[]>([]);
@@ -29,18 +37,92 @@ export default function TikTokTool() {
   // ===== COMMENTS SCAN =====
   const [commentKeyword, setCommentKeyword] = useState("");
   const [commentVideoUrl, setCommentVideoUrl] = useState("");
-  const [commentLimit, setCommentLimit] = useState(200);
+  const [commentLimit, setCommentLimit] = useState(20);
+
+  const [topKeyword, setTopKeyword] = useState("");
+  const [topLimit, setTopLimit] = useState(20);
 
   useEffect(() => {
-    const mock = MOCK_DATA_BY_TAB[tab];
-    if (!mock) return;
-
-    setScanType(mock.scanType as ScanType);
-    setResults([...mock.results]); // 👈 clone → mutable
+    const scanType = TAB_TO_SCAN_TYPE[tab];
+    if (scanType) {
+      fetchLatestTask(scanType);
+    } else {
+      setResults([]);
+      setScanType(null);
+    }
   }, [tab]);
+
+  async function submitScan(form: any) {
+    try {
+      setResults([]);
+
+      const res = await fetch(`${API_BASE_URL}/api/tiktok/scan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      if (!res.ok) {
+        throw new Error("Scan failed");
+      }
+
+      const data = await res.json();
+
+      console.log("✅ SCAN RESPONSE:", data);
+    } catch (err) {
+      console.error("❌ SCAN ERROR:", err);
+    }
+  }
+
+  async function fetchLatestTask(scanType?: ScanType | null) {
+    if (!scanType) return;
+
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/api/tiktok/task/latest?scan_type=${scanType}&status=success`,
+      );
+
+      if (!res.ok) throw new Error("Fetch latest task failed");
+
+      const json = await res.json();
+
+      if (json?.data?.result) {
+        setScanType(scanType);
+
+        if (scanType === "relations") {
+          setResults(json.data.result.friends_detail || []);
+        } else {
+          setResults(json.data.result || []);
+        }
+      }
+    } catch (err) {
+      console.error("❌ FETCH LATEST TASK ERROR:", err);
+    }
+  }
+
+  const buildScanTopPostsForm = () => {
+    const form = {
+      scan_type: "top_posts",
+      scan_account: "tool_bot_01",
+
+      keyword: topKeyword,
+      limit: topLimit,
+
+      sort_by: "engagement", // hoặc views
+      delay_range: [2000, 4000],
+      batch_size: 10,
+      batch_delay: 8000,
+    };
+
+    console.log("📤 SCAN TOP POSTS FORM:", form);
+
+    setScanType("top_posts" as ScanType);
+    submitScan(form);
+  };
+
   const buildScanUsersForm = () => {
     const form = {
-      scan_type: "search_users",
+      scan_type: "users",
       scan_account: "tool_bot_01",
       keyword: accountKeyword,
       limit,
@@ -54,15 +136,17 @@ export default function TikTokTool() {
 
     console.log("📤 SCAN USERS FORM:", form);
 
-    setScanType("search_users"); // 👈 QUAN TRỌNG
-    setResults(FAKE_ACCOUNTS);
+    setScanType("users"); // 👈 QUAN TRỌNG
+    submitScan(form);
   };
   const buildScanRelationsForm = () => {
     const form = {
       scan_type: "relations",
       scan_account: "tool_bot_01",
-      source_username: sourceUsername,
-      limit: relationLimit,
+      target_username: sourceUsername,
+      friends_limit: relationLimit,
+      followers_limit: 1000,
+      following_limit: 1000,
       delay_range: [3000, 6000],
       batch_size: 10,
       batch_delay: 12000,
@@ -72,17 +156,17 @@ export default function TikTokTool() {
     console.log("📤 SCAN RELATIONS FORM:", form);
 
     setScanType("relations"); // 👈
-    setResults([]); // sau này thay bằng FAKE_RELATIONS
+    submitScan(form);
   };
 
   const buildScanCommentsForm = () => {
     const form = {
-      scan_type: "comments",
+      scan_type: "video_comments",
       scan_account: "tool_bot_01",
 
       keyword: commentKeyword,
       video_url: commentVideoUrl,
-      limit: commentLimit,
+      limit_comments: commentLimit,
 
       delay_range: [2000, 4000],
       batch_size: 20,
@@ -93,8 +177,8 @@ export default function TikTokTool() {
 
     console.log("📤 SCAN COMMENTS FORM:", form);
 
-    setScanType("comments"); // 👈 QUAN TRỌNG
-    setResults([]);
+    setScanType("video_comments"); // 👈 QUAN TRỌNG
+    submitScan(form);
   };
 
   return (
@@ -108,7 +192,7 @@ export default function TikTokTool() {
 
       {/* TABS */}
       <div style={tabs}>
-        <Tab label="Top bài viết" value="top-posts" tab={tab} setTab={setTab} />
+        <Tab label="Top bài viết" value="top_posts" tab={tab} setTab={setTab} />
         {/* <Tab
           label="Video theo từ khóa"
           value="videos"
@@ -139,7 +223,7 @@ export default function TikTokTool() {
         /> */}
         <Tab
           label="Quét bình luận bài đăng"
-          value="comments"
+          value="video_comments"
           tab={tab}
           setTab={setTab}
         />
@@ -149,19 +233,29 @@ export default function TikTokTool() {
       <div style={layout}>
         {/* LEFT FORM */}
         <div style={left}>
-          {tab === "top-posts" && (
+          {tab === "top_posts" && (
             <>
               <h2>Quét top bài viết theo từ khóa</h2>
               <p>Dựa trên lượt xem và tương tác cao nhất</p>
 
-              <input style={inputStyle} placeholder="Từ khóa (vd: makeup)" />
+              <input
+                style={inputStyle}
+                placeholder="Từ khóa (vd: makeup)"
+                value={topKeyword}
+                onChange={(e) => setTopKeyword(e.target.value)}
+              />
+
               <input
                 style={inputStyle}
                 type="number"
                 placeholder="Số lượng (vd: 20)"
+                value={topLimit}
+                onChange={(e) => setTopLimit(Number(e.target.value))}
               />
 
-              <button style={btn}>Quét dữ liệu</button>
+              <button style={btn} onClick={buildScanTopPostsForm}>
+                Quét dữ liệu
+              </button>
             </>
           )}
 
@@ -261,17 +355,17 @@ export default function TikTokTool() {
               <button style={btn}>Tìm creator</button>
             </>
           )}
-          {tab === "comments" && (
+          {tab === "video_comments" && (
             <>
               <h2>Quét bình luận bài đăng</h2>
               <p>Lọc comment theo keyword trong video</p>
 
-              <input
+              {/* <input
                 style={inputStyle}
                 placeholder="Keyword (vd: makeup)"
                 value={commentKeyword}
                 onChange={(e) => setCommentKeyword(e.target.value)}
-              />
+              /> */}
 
               <input
                 style={inputStyle}

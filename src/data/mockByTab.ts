@@ -2,8 +2,8 @@
 import { FAKE_ACCOUNTS, FAKE_COMMENTS, FAKE_RELATIONS, FAKE_VIDEOS } from "./tiktokAccounts";
 
 export const MOCK_DATA_BY_TAB = {
-  "top-posts": {
-    scanType: "top-posts",
+  "top_posts": {
+    scanType: "top_posts",
     results: FAKE_VIDEOS, // sau này fake videos
   },
   videos: {
