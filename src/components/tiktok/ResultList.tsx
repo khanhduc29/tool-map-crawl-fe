@@ -8,22 +8,22 @@ import VideoCard, { TikTokVideo } from "./VideoCard";
 type Props = {
   scanType: ScanType | null;
   results: any[];
-  limit: number;
+  pageSize: number;
 };
 
-export default function ResultList({ scanType, results, limit }: Props) {
+export default function ResultList({ scanType, results, pageSize }: Props) {
   const [page, setPage] = useState(1);
 
   // ✅ reset page khi đổi data hoặc scanType
   useEffect(() => {
     setPage(1);
-  }, [results, scanType, limit]);
+  }, [results, scanType, pageSize]);
 
   // ✅ cắt data theo page + limit
   const pagedData = useMemo(() => {
-    const start = (page - 1) * limit;
-    return results.slice(start, start + limit);
-  }, [results, page, limit]);
+    const start = (page - 1) * pageSize;
+    return results.slice(start, start + pageSize);
+  }, [results, page, pageSize]);
 
   if (!scanType || results.length === 0) {
     return <div style={{ opacity: 0.7 }}>Chưa có dữ liệu</div>;
@@ -98,7 +98,7 @@ export default function ResultList({ scanType, results, limit }: Props) {
         <Pagination
           page={page}
           total={results.length}
-          limit={limit}
+          limit={pageSize}
           onPageChange={setPage}
         />
       </div>

@@ -25,11 +25,12 @@ const TAB_TO_SCAN_TYPE: Record<TabKey, ScanType | null> = {
 export default function TikTokTool() {
   const [tab, setTab] = useState<TabKey>("top_posts");
   const [accountKeyword, setAccountKeyword] = useState("");
-  const [limit, setLimit] = useState(3);
+  const [pageSize, setPageSize] = useState(3); 
+  const [limitUsers, setLimitUsers] = useState(3);
   const [deepScan, setDeepScan] = useState(true);
 
   const [sourceUsername, setSourceUsername] = useState("");
-  const [relationLimit, setRelationLimit] = useState(20);
+  const [relationLimit, setRelationLimit] = useState(3);
   const [relationDeepScan, setRelationDeepScan] = useState(false);
   const [scanType, setScanType] = useState<ScanType | null>(null);
   const [results, setResults] = useState<any[]>([]);
@@ -37,10 +38,10 @@ export default function TikTokTool() {
   // ===== COMMENTS SCAN =====
   const [commentKeyword, setCommentKeyword] = useState("");
   const [commentVideoUrl, setCommentVideoUrl] = useState("");
-  const [commentLimit, setCommentLimit] = useState(20);
+  const [commentLimit, setCommentLimit] = useState(3);
 
   const [topKeyword, setTopKeyword] = useState("");
-  const [topLimit, setTopLimit] = useState(20);
+  const [topLimit, setTopLimit] = useState(3);
 
   useEffect(() => {
     const scanType = TAB_TO_SCAN_TYPE[tab];
@@ -125,7 +126,7 @@ export default function TikTokTool() {
       scan_type: "users",
       scan_account: "tool_bot_01",
       keyword: accountKeyword,
-      limit,
+      limit: limitUsers,
       delay_range: [2500, 5000],
       batch_size: 5,
       batch_delay: 8000,
@@ -290,8 +291,8 @@ export default function TikTokTool() {
                 style={inputStyle}
                 type="number"
                 placeholder="Số lượng (vd: 20)"
-                value={limit}
-                onChange={(e) => setLimit(Number(e.target.value))}
+                value={limitUsers}
+                onChange={(e) => setLimitUsers(Number(e.target.value))}
               />
 
               <label style={{ opacity: 0.85 }}>
@@ -391,7 +392,7 @@ export default function TikTokTool() {
 
         {/* RIGHT RESULT */}
         <div style={right}>
-          <ResultList scanType={scanType} results={results} limit={limit} />
+          <ResultList scanType={scanType} results={results} pageSize={pageSize} />
         </div>
       </div>
     </div>
