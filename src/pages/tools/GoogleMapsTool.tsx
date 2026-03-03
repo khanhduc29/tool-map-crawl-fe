@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import "../../App.css";
 
 // const API_BASE = "http://localhost:3001/api";
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
-// const API_BASE = "https://tool-map-crawl-be-2.onrender.com/api";
+// const API_BASE = import.meta.env.VITE_API_BASE_URL;
+const API_BASE = "https://tool-map-crawl-be-2.onrender.com";
 
 type Tab = "jobs" | "tasks" | "task-result";
 type SortOrder = "asc" | "desc";
