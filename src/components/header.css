@@ -42,7 +42,6 @@
 
   background: #111;
   color: #fff;
-  display: flex;
   gap: 40px;
   padding: 32px 40px;
   border-radius: 14px;
@@ -70,7 +69,7 @@
   /* display: block; */
   color: #ccc;
   text-decoration: none;
-  margin-bottom: 8px;
+  /* margin-bottom: 8px; */
 }
 
 .menu-col a:hover {

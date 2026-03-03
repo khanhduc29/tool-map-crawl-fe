@@ -23,7 +23,7 @@
 .mega-menu-inner {
   display: grid;
   grid-template-columns: repeat(3, minmax(280px, 1fr));
-  gap: 60px;
+  gap: 20px;
 }
 
 /* ============================= */
@@ -33,7 +33,7 @@
 .menu-col {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  /* gap: 18px; */
 }
 
 /* ============================= */
