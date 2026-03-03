@@ -9,6 +9,7 @@ import TikTokTool from "./pages/tools/TikTokTool";
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
+import YouTubeTool from "./pages/tools/YoutubeTool";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/tools/google-maps" element={<GoogleMapsTool />} />
         <Route path="/tools/instagram" element={<InstagramTool />} />
         <Route path="/tools/tiktok/:tab?" element={<TikTokTool />} />
+        <Route path="/tools/youtube/:tab?" element={<YouTubeTool />} />
       </Routes>
 
       <Footer />
