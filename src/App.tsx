@@ -18,11 +18,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-         <Route path="/contact" element={<Contact />} />
-         <Route path="/terms" element={<Terms />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/terms" element={<Terms />} />
         <Route path="/tools/google-maps" element={<GoogleMapsTool />} />
         <Route path="/tools/instagram" element={<InstagramTool />} />
-        <Route path="/tools/tiktok" element={<TikTokTool />} />
+        <Route path="/tools/tiktok/:tab?" element={<TikTokTool />} />
       </Routes>
 
       <Footer />

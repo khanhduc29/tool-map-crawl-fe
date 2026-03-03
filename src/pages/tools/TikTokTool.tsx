@@ -5,6 +5,8 @@ import { FAKE_ACCOUNTS, FAKE_COMMENTS } from "../../data/tiktokAccounts";
 import { ScanType } from "../../types/tiktokResult";
 import ResultList from "../../components/tiktok/ResultList";
 import { MOCK_DATA_BY_TAB } from "../../data/mockByTab";
+import { useParams, useNavigate } from "react-router-dom";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 type TabKey =
@@ -23,7 +25,9 @@ const TAB_TO_SCAN_TYPE: Record<TabKey, ScanType | null> = {
   video_comments: "video_comments",
 };
 export default function TikTokTool() {
-  const [tab, setTab] = useState<TabKey>("top_posts");
+  const { tab: tabParam } = useParams();
+  const navigate = useNavigate();
+  const [tab, setTab] = useState<TabKey>((tabParam as TabKey) || "top_posts");
   const [accountKeyword, setAccountKeyword] = useState("");
   const [pageSize, setPageSize] = useState(3);
   const [limitUsers, setLimitUsers] = useState(3);
@@ -43,9 +47,12 @@ export default function TikTokTool() {
   const [topKeyword, setTopKeyword] = useState("");
   const [topLimit, setTopLimit] = useState(3);
 
-
   const [loading, setLoading] = useState(false);
-
+  useEffect(() => {
+    if (tabParam && tabParam !== tab) {
+      setTab(tabParam as TabKey);
+    }
+  }, [tabParam]);
   useEffect(() => {
     const nextScanType = TAB_TO_SCAN_TYPE[tab];
 
@@ -111,9 +118,8 @@ export default function TikTokTool() {
     } catch (err) {
       console.error("❌ FETCH LATEST TASK ERROR:", err);
     } finally {
-    setLoading(false);
-  }
-
+      setLoading(false);
+    }
   }
 
   const buildScanTopPostsForm = () => {
@@ -407,21 +413,21 @@ export default function TikTokTool() {
 
         {/* RIGHT RESULT */}
         <div style={right}>
-  {loading && <LoadingPanel />}
+          {loading && <LoadingPanel />}
 
-  {!loading && results.length === 0 && (
-    <EmptyState scanType={scanType} />
-  )}
+          {!loading && results.length === 0 && (
+            <EmptyState scanType={scanType} />
+          )}
 
-  {!loading && results.length > 0 && (
-    <ResultList
-      key={scanType}
-      scanType={scanType}
-      results={results}
-      pageSize={pageSize}
-    />
-  )}
-</div>
+          {!loading && results.length > 0 && (
+            <ResultList
+              key={scanType}
+              scanType={scanType}
+              results={results}
+              pageSize={pageSize}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -430,11 +436,14 @@ export default function TikTokTool() {
 /* ================= COMPONENTS ================= */
 
 function Tab({ label, value, tab, setTab, onChange }: any) {
+  const navigate = useNavigate();
+
   return (
     <button
       onClick={() => {
         setTab(value);
-        onChange?.(); // 👈 reset state
+        navigate(`/tools/tiktok/${value}`);
+        onChange?.();
       }}
       style={{
         ...tabBtn,
