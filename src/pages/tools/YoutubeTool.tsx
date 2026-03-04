@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./YouTubeTool.css";
+import YouTubeResult from "./YoutubeResult";
 
 type TabType = "videos" | "channels" | "video_comments";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -25,24 +26,25 @@ export default function YouTubeTool() {
   const [task, setTask] = useState<any>(null);
 
   useEffect(() => {
-    const fetchPendingTask = async () => {
+    const fetchLatestSuccessTask = async () => {
       try {
-        const res = await axios.get(
-          `${API_BASE_URL}/api/youtube/task/pending`,
-          {
-            params: { scan_type: activeTab },
+        const res = await axios.get(`${API_BASE_URL}/api/youtube/task/latest`, {
+          params: {
+            scan_type: activeTab,
+            status: "success",
           },
-        );
+        });
 
         if (res.data.success) {
           setTask(res.data.data);
+          setResult(res.data.data?.result || null);
         }
       } catch (err) {
         console.error(err);
       }
     };
 
-    fetchPendingTask();
+    fetchLatestSuccessTask();
   }, [activeTab]);
 
   const handleSubmit = async () => {
@@ -125,19 +127,12 @@ export default function YouTubeTool() {
         </div>
 
         <div className="yt-preview">
-          {task ? (
-            <div className="yt-card">
-              <div className="thumbnail" />
-              <div>
-                <span className="tag">#{task.scan_type}</span>
-                <p>Status: {task.status}</p>
-                <p>Keyword: {task.input?.keyword || task.input?.video_url}</p>
-                <p>Created: {new Date(task.createdAt).toLocaleString()}</p>
-              </div>
-            </div>
+          {task?.result ? (
+            // <YouTubeResult data={task.result} />
+            <YouTubeResult data={task?.result} scanType={task?.scan_type} />
           ) : (
             <div className="yt-card">
-              <p>Không có task pending</p>
+              <p>Chưa có dữ liệu</p>
             </div>
           )}
         </div>
