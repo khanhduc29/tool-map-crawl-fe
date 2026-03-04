@@ -20,7 +20,12 @@ export default function YouTubeTool() {
 
   const [keyword, setKeyword] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
-  const [limit, setLimit] = useState(10);
+  //   const [limit, setLimit] = useState(10);
+  const [limits, setLimits] = useState({
+    videos: 10,
+    channels: 10,
+    video_comments: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [task, setTask] = useState<any>(null);
@@ -37,8 +42,40 @@ export default function YouTubeTool() {
         });
 
         if (res.data.success) {
-          setTask(res.data.data);
-          setResult(res.data.data?.result || null);
+          const taskData = res.data.data;
+
+          setTask(taskData);
+          setResult(taskData?.result || null);
+
+          const input = taskData?.input || {};
+
+          if (taskData.scan_type === "video_comments") {
+            if (input.video_url) {
+              setVideoUrl(input.video_url);
+            }
+
+            if (input.limit_comments) {
+              setLimits((prev) => ({
+                ...prev,
+                video_comments: input.limit_comments,
+              }));
+            }
+          } else {
+            if (input.keyword) {
+              setKeyword(input.keyword);
+            }
+
+            if (input.limit) {
+              setLimits((prev) => ({
+                ...prev,
+                [activeTab]: input.limit,
+              }));
+            }
+
+            if (input.deep_scan_social !== undefined) {
+              setDeepScanSocial(input.deep_scan_social);
+            }
+          }
         }
       } catch (err) {
         console.error(err);
@@ -56,19 +93,19 @@ export default function YouTubeTool() {
           ? {
               scan_type: activeTab,
               video_url: videoUrl,
-              limit_comments: limit,
+              limit_comments: limits.video_comments,
             }
           : activeTab === "channels"
             ? {
                 scan_type: activeTab,
                 keyword,
-                limit,
+                limit: limits.channels,
                 deep_scan_social: deepScanSocial,
               }
             : {
                 scan_type: activeTab,
                 keyword,
-                limit,
+                limit: limits.videos,
               };
 
       await axios.post(`${API_BASE_URL}/api/youtube/scan`, payload);
@@ -115,15 +152,17 @@ export default function YouTubeTool() {
             />
           )}
           {activeTab === "channels" && (
-  <div className="yt-checkbox">
-    <input
-      type="checkbox"
-      checked={deepScanSocial}
-      onChange={(e) => setDeepScanSocial(e.target.checked)}
-    />
-    <span>Quét social của kênh (Facebook, Instagram, Website...)</span>
-  </div>
-)}
+            <div className="yt-checkbox">
+              <input
+                type="checkbox"
+                checked={deepScanSocial}
+                onChange={(e) => setDeepScanSocial(e.target.checked)}
+              />
+              <span>
+                Quét social của kênh (Facebook, Instagram, Website...)
+              </span>
+            </div>
+          )}
 
           {activeTab === "video_comments" && (
             <input
@@ -135,8 +174,13 @@ export default function YouTubeTool() {
 
           <input
             type="number"
-            value={limit}
-            onChange={(e) => setLimit(Number(e.target.value))}
+            value={limits[activeTab]}
+            onChange={(e) =>
+              setLimits({
+                ...limits,
+                [activeTab]: Number(e.target.value),
+              })
+            }
           />
 
           <button onClick={handleSubmit} disabled={loading}>
