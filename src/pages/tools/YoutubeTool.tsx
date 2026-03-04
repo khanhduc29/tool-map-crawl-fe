@@ -24,6 +24,7 @@ export default function YouTubeTool() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [task, setTask] = useState<any>(null);
+  const [deepScanSocial, setDeepScanSocial] = useState(false);
 
   useEffect(() => {
     const fetchLatestSuccessTask = async () => {
@@ -57,11 +58,18 @@ export default function YouTubeTool() {
               video_url: videoUrl,
               limit_comments: limit,
             }
-          : {
-              scan_type: activeTab,
-              keyword,
-              limit,
-            };
+          : activeTab === "channels"
+            ? {
+                scan_type: activeTab,
+                keyword,
+                limit,
+                deep_scan_social: deepScanSocial,
+              }
+            : {
+                scan_type: activeTab,
+                keyword,
+                limit,
+              };
 
       await axios.post(`${API_BASE_URL}/api/youtube/scan`, payload);
       alert("Tạo request thành công!");
@@ -106,6 +114,16 @@ export default function YouTubeTool() {
               onChange={(e) => setKeyword(e.target.value)}
             />
           )}
+          {activeTab === "channels" && (
+  <div className="yt-checkbox">
+    <input
+      type="checkbox"
+      checked={deepScanSocial}
+      onChange={(e) => setDeepScanSocial(e.target.checked)}
+    />
+    <span>Quét social của kênh (Facebook, Instagram, Website...)</span>
+  </div>
+)}
 
           {activeTab === "video_comments" && (
             <input
