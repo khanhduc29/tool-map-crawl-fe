@@ -1,7 +1,7 @@
-
-
 import { useState, useMemo } from "react";
 import "./YouTubeResult.css";
+import { FaFacebook, FaGlobe, FaInstagram } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 interface Props {
   data: any[];
@@ -24,6 +24,12 @@ export default function YouTubeResult({ data, scanType }: Props) {
   if (!data || data.length === 0) {
     return <div className="yt-empty">Không có dữ liệu</div>;
   }
+  const getSocialIcon = (url: string) => {
+    if (url.includes("instagram")) return <FaInstagram />;
+    if (url.includes("facebook")) return <FaFacebook />;
+    if (url.includes("x.com") || url.includes("twitter")) return <FaXTwitter />;
+    return <FaGlobe />;
+  };
 
   return (
     <>
@@ -64,7 +70,10 @@ export default function YouTubeResult({ data, scanType }: Props) {
 
         {scanType === "channels" &&
           paginatedData.map((channel) => (
-            <div key={channel.channel_id} className="yt-result-card channel-card">
+            <div
+              key={channel.channel_id}
+              className="yt-result-card channel-card"
+            >
               <img
                 src={channel.avatar}
                 alt={channel.name}
@@ -93,6 +102,26 @@ export default function YouTubeResult({ data, scanType }: Props) {
                   </span>
                   {channel.country && <span>🌍 {channel.country}</span>}
                 </div>
+                {channel.social_links?.length > 0 && (
+                  <div className="yt-socials">
+                    {channel.social_links.map((link: any, i: number) => {
+                      const realUrl =
+                        new URL(link.url).searchParams.get("q") || link.url;
+
+                      return (
+                        <a
+                          key={i}
+                          href={realUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="yt-social-icon"
+                        >
+                          {getSocialIcon(realUrl)}
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -102,14 +131,10 @@ export default function YouTubeResult({ data, scanType }: Props) {
             <div key={index} className="yt-result-card comment-card">
               <div className="yt-comment-header">
                 <span className="yt-author">{comment.author}</span>
-                <span>
-                  {new Date(comment.published_at).toLocaleString()}
-                </span>
+                <span>{new Date(comment.published_at).toLocaleString()}</span>
               </div>
 
-              <p style={{ whiteSpace: "pre-line" }}>
-                {comment.content}
-              </p>
+              <p style={{ whiteSpace: "pre-line" }}>{comment.content}</p>
 
               <div className="yt-meta">
                 <span>👍 {comment.likes}</span>
