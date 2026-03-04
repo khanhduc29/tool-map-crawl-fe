@@ -98,7 +98,7 @@ export default function MegaMenu({ onClose }: Props) {
                 <span className="label">Quét channel theo keyword</span>
               </Link>
 
-              <Link className="menu-item youtube" to="/tools/youtube/comments">
+              <Link className="menu-item youtube" to="/tools/youtube/video_comments">
                 <span className="icon">YT</span>
                 <span className="label">Quét comment video</span>
               </Link>
