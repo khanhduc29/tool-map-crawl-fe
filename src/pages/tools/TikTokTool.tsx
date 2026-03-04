@@ -6,6 +6,9 @@ import { ScanType } from "../../types/tiktokResult";
 import ResultList from "../../components/tiktok/ResultList";
 import { MOCK_DATA_BY_TAB } from "../../data/mockByTab";
 import { useParams, useNavigate } from "react-router-dom";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import { FaFileExcel, FaFileCode } from "react-icons/fa";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -203,6 +206,43 @@ export default function TikTokTool() {
     submitScan(form);
   };
 
+  const downloadJSON = () => {
+    if (!results || results.length === 0) return;
+
+    const blob = new Blob([JSON.stringify(results, null, 2)], {
+      type: "application/json",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `tiktok_${tab}_${Date.now()}.json`;
+    a.click();
+
+    URL.revokeObjectURL(url);
+  };
+  const downloadExcel = async () => {
+    if (!results || results.length === 0) return;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("TikTok Data");
+
+    const headers = Object.keys(results[0]);
+    worksheet.addRow(headers);
+
+    results.forEach((item: any) => {
+      worksheet.addRow(headers.map((h) => item[h]));
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(blob, `tiktok_${tab}_${Date.now()}.xlsx`);
+  };
   return (
     <div style={page}>
       {/* HEADER */}
@@ -413,6 +453,17 @@ export default function TikTokTool() {
 
         {/* RIGHT RESULT */}
         <div style={right}>
+          {!loading && results.length > 0 && (
+            <div style={{ display: "flex", gap: 10, marginBottom: 12 }}>
+              <button style={downloadBtn} onClick={downloadJSON}>
+                <FaFileCode /> JSON
+              </button>
+
+              <button style={downloadBtnExcel} onClick={downloadExcel}>
+                <FaFileExcel /> Excel
+              </button>
+            </div>
+          )}
           {loading && <LoadingPanel />}
 
           {!loading && results.length === 0 && (
@@ -532,6 +583,29 @@ const spinner = {
   borderTop: "4px solid #FF4331",
   borderRadius: "50%",
   animation: "spin 1s linear infinite",
+};
+const downloadBtn = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "none",
+  cursor: "pointer",
+  background: "#6366f1",
+  color: "#fff",
+};
+
+const downloadBtnExcel = {
+  display: "flex",
+  alignItems: "center",
+  gap: 8,
+  padding: "8px 14px",
+  borderRadius: 8,
+  border: "none",
+  cursor: "pointer",
+  background: "#16a34a",
+  color: "#fff",
 };
 function LoadingPanel() {
   return (

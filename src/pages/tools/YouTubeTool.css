@@ -119,3 +119,53 @@
   display: flex;
   align-items: center;
 }
+
+.yt-download {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+/* button */
+.yt-download button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  color: white;
+
+  transition: all 0.2s ease;
+}
+
+/* icon size */
+.yt-download button svg {
+  font-size: 16px;
+}
+
+/* JSON button */
+.yt-download button:nth-child(1) {
+  background: #6366f1;
+}
+
+.yt-download button:nth-child(1):hover {
+  background: #4f46e5;
+  transform: translateY(-1px);
+}
+
+/* Excel button */
+.yt-download button:nth-child(2) {
+  background: #16a34a;
+}
+
+.yt-download button:nth-child(2):hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}

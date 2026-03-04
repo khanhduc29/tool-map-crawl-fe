@@ -27,13 +27,13 @@ export default function MegaMenu({ onClose }: Props) {
 
               <Link className="menu-item google" to="/tools/google-maps">
                 <span className="icon">G</span>
-                <span className="label">Google Maps · Quét địa điểm</span>
+                <span className="label">Google Maps</span>
               </Link>
 
-              <Link className="menu-item google" to="/tools/google-search">
+              {/* <Link className="menu-item google" to="/tools/google-search">
                 <span className="icon">G</span>
                 <span className="label">Google Search · Quét website</span>
-              </Link>
+              </Link> */}
             </div>
 
             {/* INSTAGRAM */}

@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "./YouTubeTool.css";
 import YouTubeResult from "./YoutubeResult";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
+import { FaFileCode, FaFileExcel } from "react-icons/fa";
 
 type TabType = "videos" | "channels" | "video_comments";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -117,6 +120,46 @@ export default function YouTubeTool() {
     }
   };
 
+  const downloadExcel = async () => {
+    if (!result || result.length === 0) return;
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("YouTube Data");
+
+    const headers = Object.keys(result[0]);
+    worksheet.addRow(headers);
+
+    result.forEach((item: any) => {
+      worksheet.addRow(headers.map((h) => item[h]));
+    });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    saveAs(blob, `youtube_${activeTab}_${Date.now()}.xlsx`);
+  };
+
+  const downloadJSON = () => {
+    if (!result) return;
+
+    const blob = new Blob([JSON.stringify(result, null, 2)], {
+      type: "application/json",
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `youtube_${activeTab}_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
   return (
     <div className="yt-page">
       <div className="yt-hero">
@@ -189,6 +232,17 @@ export default function YouTubeTool() {
         </div>
 
         <div className="yt-preview">
+          {result && result.length > 0 && (
+            <div className="yt-download">
+              <button onClick={downloadJSON}>
+                <FaFileCode /> JSON
+              </button>
+
+              <button onClick={downloadExcel}>
+                <FaFileExcel /> Excel
+              </button>
+            </div>
+          )}
           {task?.result ? (
             // <YouTubeResult data={task.result} />
             <YouTubeResult data={task?.result} scanType={task?.scan_type} />
