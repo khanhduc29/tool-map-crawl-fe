@@ -38,7 +38,7 @@ export default function MegaMenu({ onClose }: Props) {
 
             {/* INSTAGRAM */}
             <div className="menu-col">
-              <div className="menu-title">Instagram</div>
+              <div className="menu-title">Instagram (chưa triển khai)</div>
 
               <Link className="menu-item instagram" to="/tools/instagram/posts">
                 <span className="icon">IG</span>
@@ -106,7 +106,7 @@ export default function MegaMenu({ onClose }: Props) {
 
             {/* PINTEREST */}
             <div className="menu-col">
-              <div className="menu-title">Pinterest</div>
+              <div className="menu-title">Pinterest (chưa triển khai)</div>
 
               <Link className="menu-item pinterest" to="/tools/pinterest/pins">
                 <span className="icon">P</span>
@@ -124,7 +124,7 @@ export default function MegaMenu({ onClose }: Props) {
 
             {/* TWITTER */}
             <div className="menu-col">
-              <div className="menu-title">X (Twitter)</div>
+              <div className="menu-title">X (Twitter) (chưa triển khai)</div>
 
               <Link className="menu-item twitter" to="/tools/x/posts">
                 <span className="icon">X</span>
@@ -153,7 +153,7 @@ export default function MegaMenu({ onClose }: Props) {
         <>
           <div className="mega-menu-inner">
             <div className="menu-col">
-              <div className="menu-title">Facebook</div>
+              <div className="menu-title">Facebook (chưa triển khai)</div>
 
               <Link className="menu-item facebook" to="/tools/facebook/posts">
                 <span className="icon">FB</span>
@@ -167,7 +167,7 @@ export default function MegaMenu({ onClose }: Props) {
             </div>
 
             <div className="menu-col">
-              <div className="menu-title">Threads</div>
+              <div className="menu-title">Threads (chưa triển khai)</div>
 
               <Link className="menu-item threads" to="/tools/threads/posts">
                 <span className="icon">TH</span>
@@ -176,7 +176,7 @@ export default function MegaMenu({ onClose }: Props) {
             </div>
 
             <div className="menu-col">
-              <div className="menu-title">LinkedIn</div>
+              <div className="menu-title">LinkedIn (chưa triển khai)</div>
 
               <Link className="menu-item linkedin" to="/tools/linkedin/users">
                 <span className="icon">IN</span>

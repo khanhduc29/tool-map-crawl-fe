@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import "../../App.css";
 
-// const API_BASE = "http://localhost:3001/api";
-// const API_BASE = import.meta.env.VITE_API_BASE_URL;
-const API_BASE = "https://tool-map-crawl-be-2.onrender.com";
+// const API_BASE = "http://localhost:3000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
+// const API_BASE = "https://tool-map-crawl-be-2.onrender.com";
 
 type Tab = "jobs" | "tasks" | "task-result";
 type SortOrder = "asc" | "desc";
@@ -165,19 +165,19 @@ export default function App() {
   }
   // ===== API =====
   const fetchJobs = async () => {
-    const res = await fetch(`${API_BASE}/api/crawl-jobs`);
+    const res = await fetch(`${API_BASE}/api/google-map/crawl-jobs`);
     const json = await res.json();
     setJobs(json.data || []);
   };
 
   const fetchTasks = async (jobId: string) => {
-    const res = await fetch(`${API_BASE}/api/crawl-tasks?jobId=${jobId}`);
+    const res = await fetch(`${API_BASE}/api/google-map/crawl-tasks?jobId=${jobId}`);
     const json = await res.json();
     setTasks(json.data || []);
   };
 
   const fetchTaskDetail = async (taskId: string) => {
-    const res = await fetch(`${API_BASE}/api/crawl-tasks/${taskId}`);
+    const res = await fetch(`${API_BASE}/api/google-map/crawl-tasks/${taskId}`);
     const json = await res.json();
 
     setSelectedTask(json.data);
@@ -198,18 +198,17 @@ export default function App() {
       return;
     }
 
-    await fetch(`${API_BASE}/api/crawl-jobs`, {
+    await fetch(`${API_BASE}/api/google-map/scan`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        toolType: "google_map",
-        keyword,
+        raw_keywords: keyword, // giữ nguyên string
         address,
-        limit,
-        delay,
         region,
-        deepScan,
-        deepScanWebsite,
+        result_limit: limit, // rename
+        delay_seconds: delay, // rename
+        deep_scan: deepScan, // rename
+        deep_scan_website: deepScanWebsite, // rename
       }),
     });
 
@@ -378,7 +377,7 @@ export default function App() {
                     </td>
 
                     {/* total_limit */}
-                    <td>{job.total_limit}</td>
+                    <td>{job.result_limit}</td>
 
                     {/* address */}
                     <td>
@@ -414,8 +413,8 @@ export default function App() {
                     <td>
                       <button
                         onClick={() => {
-                          setSelectedJobId(job.id);
-                          fetchTasks(job.id);
+                          setSelectedJobId(job._id);
+                          fetchTasks(job._id);
                           setTab("tasks");
                         }}
                       >
@@ -435,7 +434,7 @@ export default function App() {
                 >
                   ← Prev
                 </button>
-    
+
                 {Array.from({ length: totalPagess }).map((_, i) => {
                   const page = i + 1;
                   return (
@@ -448,7 +447,7 @@ export default function App() {
                     </button>
                   );
                 })}
-    
+
                 <button
                   disabled={currentPage === totalPagess}
                   onClick={() => setCurrentPage((p) => p + 1)}
@@ -474,13 +473,13 @@ export default function App() {
               </thead>
               <tbody>
                 {tasks.map((task) => (
-                  <tr key={task.id}>
-                    <td>{task.id.slice(0, 8)}</td>
+                  <tr key={task._id}>
+                    <td>{task._id.slice(0, 8)}</td>
                     <td>{task.keyword}</td>
                     <td>{task.status}</td>
                     <td>
                       {task.status === "success" && (
-                        <button onClick={() => fetchTaskDetail(task.id)}>
+                        <button onClick={() => fetchTaskDetail(task._id)}>
                           Xem kết quả
                         </button>
                       )}
