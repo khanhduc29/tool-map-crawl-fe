@@ -537,3 +537,34 @@ td:has(.check) {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+
+button.run:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.run.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+button.run.loading::after {
+  content: "";
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}

@@ -107,6 +107,7 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [onlyHasSocial, setOnlyHasSocial] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
 
   // ===== UI STATE =====
   const [tab, setTab] = useState<Tab>("jobs");
@@ -171,7 +172,9 @@ export default function App() {
   };
 
   const fetchTasks = async (jobId: string) => {
-    const res = await fetch(`${API_BASE}/api/google-map/crawl-tasks?jobId=${jobId}`);
+    const res = await fetch(
+      `${API_BASE}/api/google-map/crawl-tasks?jobId=${jobId}`,
+    );
     const json = await res.json();
     setTasks(json.data || []);
   };
@@ -184,7 +187,42 @@ export default function App() {
     setPage(1); // 👈 reset về trang 1
     setTab("task-result");
   };
+  // const createJob = async () => {
+  //   if (isCreating) return;
+  //   const newErrors: any = {};
+
+  //   if (!keyword.trim()) newErrors.keyword = true;
+  //   if (!address.trim()) newErrors.address = true;
+  //   if (!limit || limit <= 0) newErrors.limit = true;
+
+  //   setErrors(newErrors);
+
+  //   if (Object.keys(newErrors).length > 0) {
+  //     alert("Vui lòng điền đầy đủ các trường bắt buộc ⭐");
+  //     return;
+  //   }
+
+  //   await fetch(`${API_BASE}/api/google-map/scan`, {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/json" },
+  //     body: JSON.stringify({
+  //       raw_keywords: keyword, // giữ nguyên string
+  //       address,
+  //       region,
+  //       result_limit: limit, // rename
+  //       delay_seconds: delay, // rename
+  //       deep_scan: deepScan, // rename
+  //       deep_scan_website: deepScanWebsite, // rename
+  //     }),
+  //   });
+
+  //   setTab("jobs");
+  //   fetchJobs();
+  // };
+
   const createJob = async () => {
+    if (isCreating) return; // ❗ chặn spam click
+
     const newErrors: any = {};
 
     if (!keyword.trim()) newErrors.keyword = true;
@@ -198,24 +236,29 @@ export default function App() {
       return;
     }
 
-    await fetch(`${API_BASE}/api/google-map/scan`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        raw_keywords: keyword, // giữ nguyên string
-        address,
-        region,
-        result_limit: limit, // rename
-        delay_seconds: delay, // rename
-        deep_scan: deepScan, // rename
-        deep_scan_website: deepScanWebsite, // rename
-      }),
-    });
+    try {
+      setIsCreating(true);
 
-    setTab("jobs");
-    fetchJobs();
+      await fetch(`${API_BASE}/api/google-map/scan`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          raw_keywords: keyword,
+          address,
+          region,
+          result_limit: limit,
+          delay_seconds: delay,
+          deep_scan: deepScan,
+          deep_scan_website: deepScanWebsite,
+        }),
+      });
+
+      setTab("jobs");
+      fetchJobs();
+    } finally {
+      setIsCreating(false);
+    }
   };
-
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -326,8 +369,11 @@ export default function App() {
           </label>
         </div>
 
-        <button className="run" onClick={createJob}>
+        {/* <button className="run" onClick={createJob}>
           Bắt đầu quét
+        </button> */}
+        <button className="run" onClick={createJob} disabled={isCreating}>
+          {isCreating ? "Đang tạo job..." : "Bắt đầu quét"}
         </button>
       </div>
 
@@ -362,7 +408,7 @@ export default function App() {
                   <th>Address</th>
                   {/* <th>Deep scan</th> */}
                   <th>Deep website</th>
-                  <th>Status</th>
+                  {/* <th>Status</th> */}
                   <th></th>
                 </tr>
               </thead>
@@ -407,7 +453,7 @@ export default function App() {
                     </td>
 
                     {/* status */}
-                    <td>{job.status}</td>
+                    {/* <td>{job.status}</td> */}
 
                     {/* action */}
                     <td>
