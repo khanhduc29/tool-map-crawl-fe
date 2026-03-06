@@ -67,8 +67,17 @@ export default function TikTokTool() {
       fetchLatestTask(nextScanType);
     }
   }, [tab]);
+  useEffect(() => {
+    if (!scanType) return;
 
+    const interval = setInterval(() => {
+      fetchLatestTask(scanType);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [scanType]);
   async function submitScan(form: any) {
+    if (loading) return;
     try {
       setLoading(true);
       setResults([]);
@@ -315,8 +324,16 @@ export default function TikTokTool() {
                 onChange={(e) => setTopLimit(Number(e.target.value))}
               />
 
-              <button style={btn} onClick={buildScanTopPostsForm}>
-                Quét dữ liệu
+              <button
+                style={{
+                  ...btn,
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                onClick={buildScanTopPostsForm}
+                disabled={loading}
+              >
+                {loading ? "Đang quét..." : "Quét dữ liệu"}
               </button>
             </>
           )}
@@ -365,8 +382,16 @@ export default function TikTokTool() {
                 Quét chi tiết tài khoản
               </label>
 
-              <button style={btn} onClick={buildScanUsersForm}>
-                Quét tài khoản
+              <button
+                style={{
+                  ...btn,
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                onClick={buildScanUsersForm}
+                disabled={loading}
+              >
+                {loading ? "Đang quét..." : "Quét tài khoản"}
               </button>
             </>
           )}
@@ -400,8 +425,16 @@ export default function TikTokTool() {
                 Quét chi tiết từng tài khoản
               </label>
 
-              <button style={btn} onClick={buildScanRelationsForm}>
-                Quét bạn bè
+              <button
+                style={{
+                  ...btn,
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                onClick={buildScanRelationsForm}
+                disabled={loading}
+              >
+                {loading ? "Đang quét..." : "Quét bạn bè"}
               </button>
             </>
           )}
@@ -444,8 +477,16 @@ export default function TikTokTool() {
                 onChange={(e) => setCommentLimit(Number(e.target.value))}
               />
 
-              <button style={btn} onClick={buildScanCommentsForm}>
-                Quét bình luận
+              <button
+                style={{
+                  ...btn,
+                  opacity: loading ? 0.6 : 1,
+                  cursor: loading ? "not-allowed" : "pointer",
+                }}
+                onClick={buildScanCommentsForm}
+                disabled={loading}
+              >
+                {loading ? "Đang quét..." : "Quét bình luận"}
               </button>
             </>
           )}

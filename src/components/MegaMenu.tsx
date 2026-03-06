@@ -106,7 +106,7 @@ export default function MegaMenu({ onClose }: Props) {
 
             {/* PINTEREST */}
             <div className="menu-col">
-              <div className="menu-title">Pinterest (đã có data mẫu)</div>
+              <div className="menu-title">Pinterest</div>
 
               <Link className="menu-item pinterest" to="/tools/pinterest">
                 <span className="icon">P</span>
