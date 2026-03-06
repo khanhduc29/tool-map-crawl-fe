@@ -1,10 +1,6 @@
 import { use, useEffect, useState } from "react";
-import { Users, UserPlus } from "lucide-react";
-import { TikTokAccount } from "../../types/tiktok";
-import { FAKE_ACCOUNTS, FAKE_COMMENTS } from "../../data/tiktokAccounts";
 import { ScanType } from "../../types/tiktokResult";
 import ResultList from "../../components/tiktok/ResultList";
-import { MOCK_DATA_BY_TAB } from "../../data/mockByTab";
 import { useParams, useNavigate } from "react-router-dom";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
