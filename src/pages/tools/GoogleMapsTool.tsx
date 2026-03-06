@@ -345,7 +345,7 @@ export default function App() {
           <option value="global">Quốc tế</option>
         </select>
 
-        <div className="switch-row">
+        {/* <div className="switch-row">
           <span>Quét chi tiết (đang triển khai)</span>
           <label className="switch">
             <input
@@ -355,7 +355,7 @@ export default function App() {
             />
             <span />
           </label>
-        </div>
+        </div> */}
 
         <div className="switch-row">
           <span>Quét chi tiết website</span>
