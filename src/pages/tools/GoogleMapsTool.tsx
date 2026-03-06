@@ -101,7 +101,7 @@ export default function App() {
   const [limit, setLimit] = useState(100);
   const [delay, setDelay] = useState(3);
   const [region, setRegion] = useState("vn");
-  const [deepScan, setDeepScan] = useState(true);
+  const [deepScan, setDeepScan] = useState(false);
   const [deepScanWebsite, setDeepScanWebsite] = useState(true);
 
   const [page, setPage] = useState(1);
@@ -248,7 +248,7 @@ export default function App() {
           region,
           result_limit: limit,
           delay_seconds: delay,
-          deep_scan: deepScan,
+          deep_scan: false, // tạm ẩn deep_scan vì đang phát triển
           deep_scan_website: deepScanWebsite,
         }),
       });
