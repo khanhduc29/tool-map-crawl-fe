@@ -40,22 +40,9 @@ export default function MegaMenu({ onClose }: Props) {
             <div className="menu-col">
               <div className="menu-title">Instagram (chưa triển khai)</div>
 
-              <Link className="menu-item instagram" to="/tools/instagram/posts">
+              <Link className="menu-item instagram" to="/tools/instagram">
                 <span className="icon">IG</span>
-                <span className="label">Quét bài viết theo hashtag</span>
-              </Link>
-
-              <Link className="menu-item instagram" to="/tools/instagram/users">
-                <span className="icon">IG</span>
-                <span className="label">Quét người dùng theo keyword</span>
-              </Link>
-
-              <Link
-                className="menu-item instagram"
-                to="/tools/instagram/profile"
-              >
-                <span className="icon">IG</span>
-                <span className="label">Phân tích tài khoản</span>
+                <span className="label">Quét chi tiết trang</span>
               </Link>
             </div>
 
