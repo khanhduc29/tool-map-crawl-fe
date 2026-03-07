@@ -38,7 +38,7 @@ export default function MegaMenu({ onClose }: Props) {
 
             {/* INSTAGRAM */}
             <div className="menu-col">
-              <div className="menu-title">Instagram (chưa triển khai)</div>
+              <div className="menu-title">Instagram </div>
 
               <Link className="menu-item instagram" to="/tools/instagram">
                 <span className="icon">IG</span>
