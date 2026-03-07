@@ -42,29 +42,45 @@ export default function InstagramTool() {
   const [history, setHistory] = useState<Task[]>([]);
 
   const ref = useRef<HTMLDivElement>(null);
+  const historyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    fetchResults(); // lấy task mới nhất
+    fetchHistory(); // lấy 20 task history
+  }, []);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showHistory &&
+        historyRef.current &&
+        !historyRef.current.contains(event.target as Node)
+      ) {
+        setShowHistory(false);
+      }
+    };
 
-useEffect(() => {
-  fetchResults();   // lấy task mới nhất
-  fetchHistory();   // lấy 20 task history
-}, []);
+    document.addEventListener("mousedown", handleClickOutside);
 
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showHistory]);
   const fetchResults = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/api/instagram/tasks?limit=1`);
+    try {
+      const res = await fetch(`${API_BASE}/api/instagram/tasks?limit=1`);
 
-    const data: TaskResponse = await res.json();
+      const data: TaskResponse = await res.json();
 
-    if (!data.success || !data.data.length) return;
+      if (!data.success || !data.data.length) return;
 
-    const task = data.data[0];
+      const task = data.data[0];
 
-    if (task.status === "success" && task.result) {
-      setProfiles([task.result]);
+      if (task.status === "success" && task.result) {
+        setProfiles([task.result]);
+      }
+    } catch (err) {
+      console.error(err);
     }
-  } catch (err) {
-    console.error(err);
-  }
-};
+  };
 
   const fetchHistory = async () => {
     try {
@@ -81,36 +97,36 @@ useEffect(() => {
   };
 
   const handleScan = async () => {
-  if (!url) return;
+    if (!url) return;
 
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    await fetch(`${API_BASE}/api/instagram/create-scan`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        inputs: [
-          {
-            url,
-            scan_website: scanWebsite,
-          },
-        ],
-      }),
-    });
+      await fetch(`${API_BASE}/api/instagram/create-scan`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: [
+            {
+              url,
+              scan_website: scanWebsite,
+            },
+          ],
+        }),
+      });
 
-    setUrl("");
+      setUrl("");
 
-    fetchHistory();
-    fetchResults();
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setLoading(false);
-  }
-};
+      fetchHistory();
+      fetchResults();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const unique = (arr: (string | null | undefined)[]) => {
     return [...new Set(arr.filter(Boolean))];
@@ -235,7 +251,10 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className={`insta-history ${showHistory ? "open" : ""}`}>
+      <div
+        ref={historyRef}
+        className={`insta-history ${showHistory ? "open" : ""}`}
+      >
         <div className="history-header">
           <h3>Scan History</h3>
           <button onClick={() => setShowHistory(false)}>✕</button>
