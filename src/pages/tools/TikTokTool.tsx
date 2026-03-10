@@ -63,15 +63,15 @@ export default function TikTokTool() {
       fetchLatestTask(nextScanType);
     }
   }, [tab]);
-  useEffect(() => {
-    if (!scanType) return;
+  // useEffect(() => {
+  //   if (!scanType) return;
 
-    const interval = setInterval(() => {
-      fetchLatestTask(scanType);
-    }, 5000);
+  //   const interval = setInterval(() => {
+  //     fetchLatestTask(scanType);
+  //   }, 5000);
 
-    return () => clearInterval(interval);
-  }, [scanType]);
+  //   return () => clearInterval(interval);
+  // }, [scanType]);
   async function submitScan(form: any) {
     if (loading) return;
     try {
